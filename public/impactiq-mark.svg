@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="g9b" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <clipPath id="qclip">
+      <circle cx="38" cy="32" r="12.5"/>
+    </clipPath>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g9)"/>
+  <!-- "I" on left -->
+  <rect x="11" y="16" width="3.5" height="32" rx="1.5" fill="white" opacity="0.95"/>
+  <!-- "Q" circle on right -->
+  <circle cx="38" cy="32" r="14" fill="none" stroke="white" stroke-width="3" opacity="0.95"/>
+  <!-- Q tail -->
+  <line x1="46" y1="42" x2="52" y2="50" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+  <!-- Concentric wifi-like arcs inside the Q, clipped to circle -->
+  <g clip-path="url(#qclip)">
+    <path d="M38 32 m-11 0 a11 11 0 0 1 11-11" fill="none" stroke="white" stroke-width="1.5" opacity="0.2" stroke-linecap="round"/>
+    <path d="M38 32 m-7.5 0 a7.5 7.5 0 0 1 7.5-7.5" fill="none" stroke="white" stroke-width="1.5" opacity="0.35" stroke-linecap="round"/>
+  </g>
+  <!-- Spark inside the Q -->
+  <path d="M38 24 L39.3 30.7 L46 32 L39.3 33.3 L38 40 L36.7 33.3 L30 32 L36.7 30.7 Z" fill="url(#g9b)" opacity="1"/>
+</svg>

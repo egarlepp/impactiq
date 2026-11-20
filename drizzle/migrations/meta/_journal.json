@@ -1,0 +1,1315 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782244887576,
+      "tag": "0000_initial_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782255903245,
+      "tag": "0001_add_password_hash",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782259054936,
+      "tag": "0002_add_sf_instance_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782321947235,
+      "tag": "0003_add_team_icon_and_themes",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782324008990,
+      "tag": "0004_app_admin_and_global_configs",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782330223868,
+      "tag": "0005_team_assignment_junction_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782336339587,
+      "tag": "0006_sf_mapping_teams_and_team_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782400000000,
+      "tag": "0007_theme_logos_and_palette",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1782500000000,
+      "tag": "0008_must_change_password",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782600000000,
+      "tag": "0009_activity_fields_and_typical_duration",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1782700000000,
+      "tag": "0010_backfill_sf_mappings_and_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1782800000000,
+      "tag": "0011_notification_prefs",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1782900000000,
+      "tag": "0012_user_auth_and_default_team",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1783000000000,
+      "tag": "0013_okta_group_mappings_and_role_permissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1783100000000,
+      "tag": "0014_activity_type_colors_and_work_week",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1783200000000,
+      "tag": "0015_holiday_calendars",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1783300000000,
+      "tag": "0016_user_pto_days",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1783400000000,
+      "tag": "0017_team_calendars_and_per_day_hours",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783500000000,
+      "tag": "0018_products",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783600000000,
+      "tag": "0019_activity_meeting_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1783700000000,
+      "tag": "0020_sf_field_mapping_constants",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1783800000000,
+      "tag": "0021_nudge_trigger_types",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1783900000000,
+      "tag": "0022_users_timezone_checked_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1784000000000,
+      "tag": "0023_activity_acv",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784100000000,
+      "tag": "0024_backfill_acv_field_mapping",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784200000000,
+      "tag": "0025_hourly_cost_rate",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1784300000000,
+      "tag": "0026_outlook_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1784400000000,
+      "tag": "0027_mfa_totp",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1784500000000,
+      "tag": "0028_audit_log",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1784600000000,
+      "tag": "0029_api_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1784700000000,
+      "tag": "0030_activity_templates",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1784800000000,
+      "tag": "0031_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1784900000000,
+      "tag": "0032_slack",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1785000000000,
+      "tag": "0033_dedupe_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1785100000000,
+      "tag": "0034_capacity_cost_unified",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1785200000000,
+      "tag": "0035_fx_rates",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1785300000000,
+      "tag": "0036_login_failures",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1785400000000,
+      "tag": "0037_dedupe_sessions_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1785500000000,
+      "tag": "0038_add_sf_synced_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1785500001000,
+      "tag": "0039_dashboard_presets",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1785500002000,
+      "tag": "0040_weekly_recap_pref",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1785500003000,
+      "tag": "0041_email_prefs_default_true",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1785500004000,
+      "tag": "0042_sales_team_alignment",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1785500005000,
+      "tag": "0043_worker_type_and_wwr",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1785500006000,
+      "tag": "0044_team_work_week_defaults",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1785500007000,
+      "tag": "0045_sf_object_owner_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1785500008000,
+      "tag": "0046_non_activity_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1785500009000,
+      "tag": "0047_activity_type_none",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1785500010000,
+      "tag": "0048_session_mfa_method",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1785500011000,
+      "tag": "0049_activity_type_sf_picklist_value",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1785500012000,
+      "tag": "0050_sf_field_mapping_direction",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1785500013000,
+      "tag": "0051_activity_sf_who",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1785500014000,
+      "tag": "0052_sf_what_type_campaign",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1785500015000,
+      "tag": "0053_activity_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1785500016000,
+      "tag": "0054_activity_note_pushes",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1785500017000,
+      "tag": "0055_note_meddpicc",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1785500018000,
+      "tag": "0056_teams_sf_department",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1785500019000,
+      "tag": "0057_teams_sf_departments_array",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1785500020000,
+      "tag": "0058_activity_sync_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1785500021000,
+      "tag": "0059_flip_standard_sf_mappings_writable",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1785500022000,
+      "tag": "0060_seed_activity_status_completed",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1785500023000,
+      "tag": "0061_sf_users_title",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1785500024000,
+      "tag": "0062_subteams",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1785500025000,
+      "tag": "0063_activity_opp_snapshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1785500026000,
+      "tag": "0064_nudge_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1785500027000,
+      "tag": "0065_nudge_rules_severity_icon",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1785500028000,
+      "tag": "0066_nudge_cooldown",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1785500029000,
+      "tag": "0067_teams_slack_webhook",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1785500030000,
+      "tag": "0068_nudge_final_batch",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1785500031000,
+      "tag": "0069_activity_type_sf_extras",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1785500032000,
+      "tag": "0070_users_preferred_currency",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1785500033000,
+      "tag": "0071_user_integrations_account_label",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1785500034000,
+      "tag": "0072_theme_email_template",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1785500035000,
+      "tag": "0073_teams_active_theme",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1785500036000,
+      "tag": "0074_outlook_sf_suggestions",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1785500037000,
+      "tag": "0075_products_icon_data_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1785500038000,
+      "tag": "0076_sync_is_app_admin",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1785500039000,
+      "tag": "0077_nudge_rules_send_email",
+      "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1785500040000,
+      "tag": "0078_activities_sf_cached",
+      "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1785500041000,
+      "tag": "0079_email_rules",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1785500042000,
+      "tag": "0080_email_rules_welcome_invite",
+      "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1785500043000,
+      "tag": "0081_password_reset_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1785500044000,
+      "tag": "0082_outlook_opp_account",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1785500045000,
+      "tag": "0083_activity_type_typical_duration_and_nudge_translations",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1785500046000,
+      "tag": "0084_user_name_split_and_private_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1785500047000,
+      "tag": "0085_sf_snapshot_and_leaderboard",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1785500048000,
+      "tag": "0086_bg_refresh_and_job_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1785500049000,
+      "tag": "0087_refresh_only_and_seed",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1785500050000,
+      "tag": "0088_job_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1785500051000,
+      "tag": "0089_api_key_scopes_and_mcp_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1785500052000,
+      "tag": "0090_evaluation_field_snapshots",
+      "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1785500053000,
+      "tag": "0091_fix_eval_object_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1785500054000,
+      "tag": "0092_correct_eval_date_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1785500055000,
+      "tag": "0093_seed_scheduling_notes_permissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1785500056000,
+      "tag": "0094_activity_outlook_writeback",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1785500057000,
+      "tag": "0095_dedupe_archived_activities",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1785500058000,
+      "tag": "0096_activity_incidental_costs",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1785500059000,
+      "tag": "0097_subteam_hierarchy",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1785500060000,
+      "tag": "0098_user_azure_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1785500061000,
+      "tag": "0099_seed_project_costing_permission",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1785500062000,
+      "tag": "0100_attach_rate",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1785500063000,
+      "tag": "0101_opp_coverage",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1785500064000,
+      "tag": "0102_attach_rate_multiobject",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1785500065000,
+      "tag": "0103_attach_rate_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1785500066000,
+      "tag": "0104_sf_user_names",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1785500067000,
+      "tag": "0105_attach_rate_roles_acv",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1785500068000,
+      "tag": "0106_opp_coverage_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1785500069000,
+      "tag": "0107_opp_coverage_owner_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1785500070000,
+      "tag": "0108_opp_coverage_total_acv",
+      "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1785500071000,
+      "tag": "0109_perf_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1785500072000,
+      "tag": "0110_writeback_retry",
+      "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1785500073000,
+      "tag": "0111_historical_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1785500074000,
+      "tag": "0112_historical_exclusions",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1785500075000,
+      "tag": "0113_role_matrix_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1785500076000,
+      "tag": "0114_outlook_free_busy",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1785500077000,
+      "tag": "0115_calendar_derived_capacity",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1785500078000,
+      "tag": "0116_capacity_groups_meeting_load_flag",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1785500079000,
+      "tag": "0117_job_config_scheduling",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1785500080000,
+      "tag": "0118_job_config_schedule_time",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1785500081000,
+      "tag": "0119_email_rules_job_failure_alert",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1785600000000,
+      "tag": "0120_default_suggestion_and_non_activity_rules",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1785700000000,
+      "tag": "0121_activity_submitted_at",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1785800000000,
+      "tag": "0122_activity_outlook_deleted",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1785900000000,
+      "tag": "0123_user_non_activity_keywords",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1786000000000,
+      "tag": "0124_role_seed_team_activity_deep_dive",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1786100000000,
+      "tag": "0125_flight_deck",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1786200000000,
+      "tag": "0126_flight_deck_enhancements",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1786300000000,
+      "tag": "0127_flight_deck_outlook_item_and_full_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1786400000000,
+      "tag": "0128_activity_type_guide_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1786500000000,
+      "tag": "0129_activity_type_subtypes_seed",
+      "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1786600000000,
+      "tag": "0130_activity_subtypes_enabled",
+      "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1786700000000,
+      "tag": "0131_activity_meeting_type_reason",
+      "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1786800000000,
+      "tag": "0132_activity_health_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1786900000000,
+      "tag": "0133_sync_audit_generalize",
+      "breakpoints": true
+    },
+    {
+      "idx": 134,
+      "version": "7",
+      "when": 1787000000000,
+      "tag": "0134_sync_issue_resolutions",
+      "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1787100000000,
+      "tag": "0135_private_meetings",
+      "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1787200000000,
+      "tag": "0136_default_subteam",
+      "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1787300000000,
+      "tag": "0137_role_seed_subtype_breakdown",
+      "breakpoints": true
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1787400000000,
+      "tag": "0138_role_seed_won_without_poc",
+      "breakpoints": true
+    },
+    {
+      "idx": 139,
+      "version": "7",
+      "when": 1787500000000,
+      "tag": "0139_eval_primary_engineer",
+      "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1787600000000,
+      "tag": "0140_nudge_dismissal_permanent",
+      "breakpoints": true
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1787700000000,
+      "tag": "0141_meeting_owner_email",
+      "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1787800000000,
+      "tag": "0142_password_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 143,
+      "version": "7",
+      "when": 1787900000000,
+      "tag": "0143_nudge_rule_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1788000000000,
+      "tag": "0144_nudge_history_team_scope",
+      "breakpoints": true
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1788100000000,
+      "tag": "0145_marketing_event_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1788200000000,
+      "tag": "0146_activity_sf_tickets",
+      "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1788300000000,
+      "tag": "0147_activity_sf_disconnect_flags",
+      "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1788400000000,
+      "tag": "0148_opp_review_dismissals",
+      "breakpoints": true
+    },
+    {
+      "idx": 149,
+      "version": "7",
+      "when": 1788500000000,
+      "tag": "0149_promote_palette_to_theme",
+      "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1788600000000,
+      "tag": "0150_announcements",
+      "breakpoints": true
+    },
+    {
+      "idx": 151,
+      "version": "7",
+      "when": 1788700000000,
+      "tag": "0151_announcement_icon_and_toast_colors",
+      "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1788800000000,
+      "tag": "0152_generic_default_theme_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1788900000000,
+      "tag": "0153_default_activity_type_styles",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1789000000000,
+      "tag": "0154_criteriaiq_evaluation_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1789100000000,
+      "tag": "0155_hubspot_owners",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1789200000000,
+      "tag": "0156_ai_providers",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1789300000000,
+      "tag": "0157_hubspot_owner_teams",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1789400000000,
+      "tag": "0158_crm_record_adopted",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1789500000000,
+      "tag": "0159_crm_activity_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1789600000000,
+      "tag": "0160_crm_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1789700000000,
+      "tag": "0161_crm_columns_enums",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1789800000000,
+      "tag": "0162_auth_method_azure",
+      "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1789900000000,
+      "tag": "0163_user_disabled",
+      "breakpoints": true
+    },
+    {
+      "idx": 164,
+      "version": "7",
+      "when": 1790000000000,
+      "tag": "0164_ai_webhook_provider",
+      "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1790100000000,
+      "tag": "0165_event_webhooks",
+      "breakpoints": true
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1790200000000,
+      "tag": "0166_event_webhook_filters",
+      "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1790300000000,
+      "tag": "0167_slack_routing",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1790400000000,
+      "tag": "0168_email_rule_slack",
+      "breakpoints": true
+    },
+    {
+      "idx": 169,
+      "version": "7",
+      "when": 1790500000000,
+      "tag": "0169_email_deliveries",
+      "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1790600000000,
+      "tag": "0170_integration_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1790700000000,
+      "tag": "0171_terminology",
+      "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1790800000000,
+      "tag": "0172_criteriaiq_webhook_receipts",
+      "breakpoints": true
+    },
+    {
+      "idx": 173,
+      "version": "7",
+      "when": 1790900000000,
+      "tag": "0173_gong_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 174,
+      "version": "7",
+      "when": 1791000000000,
+      "tag": "0174_project_count_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 175,
+      "version": "7",
+      "when": 1791100000000,
+      "tag": "0175_gong_transcripts",
+      "breakpoints": true
+    },
+    {
+      "idx": 176,
+      "version": "7",
+      "when": 1791200000000,
+      "tag": "0176_gong_auto_link",
+      "breakpoints": true
+    },
+    {
+      "idx": 177,
+      "version": "7",
+      "when": 1791300000000,
+      "tag": "0177_ai_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 178,
+      "version": "7",
+      "when": 1791400000000,
+      "tag": "0178_ai_assessments",
+      "breakpoints": true
+    },
+    {
+      "idx": 179,
+      "version": "7",
+      "when": 1791500000000,
+      "tag": "0179_ai_assessment_scores",
+      "breakpoints": true
+    },
+    {
+      "idx": 180,
+      "version": "7",
+      "when": 1791600000000,
+      "tag": "0180_ai_assessment_dashboard",
+      "breakpoints": true
+    },
+    {
+      "idx": 181,
+      "version": "7",
+      "when": 1791700000000,
+      "tag": "0181_ai_assessment_icon",
+      "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1791800000000,
+      "tag": "0182_ai_note_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1791900000000,
+      "tag": "0183_user_timezone_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1792000000000,
+      "tag": "0184_ai_note_default_profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 185,
+      "version": "7",
+      "when": 1792100000000,
+      "tag": "0185_ai_request_item_count",
+      "breakpoints": true
+    },
+    {
+      "idx": 186,
+      "version": "7",
+      "when": 1792200000000,
+      "tag": "0186_sf_se_filter_mappings",
+      "breakpoints": true
+    }
+  ]
+}

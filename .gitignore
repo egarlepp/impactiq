@@ -1,0 +1,25 @@
+**/node_modules/
+dist/
+*.tsbuildinfo
+.env
+*.local
+.DS_Store
+
+# Stale tsc emit alongside .ts sources
+src/**/*.js
+src/**/*.d.ts
+src/**/*.js.map
+src/**/*.d.ts.map
+drizzle/*.js
+drizzle/*.d.ts
+drizzle/*.js.map
+drizzle/*.d.ts.map
+drizzle.config.js
+drizzle.config.d.ts
+drizzle.config.js.map
+drizzle.config.d.ts.map
+vitest.config.js
+vitest.config.d.ts
+vitest.config.js.map
+vitest.config.d.ts.map
+.claude/

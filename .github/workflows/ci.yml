@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck, tests, i18n
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck server
+        run: npx tsc --noEmit -p tsconfig.server.json
+      - name: Typecheck client
+        run: npx tsc -b --noEmit
+        working-directory: src/client
+      - name: i18n key parity
+        run: python3 scripts/check-i18n-parity.py
+      - name: No banned organization names
+        run: python3 scripts/check-banned-terms.py
+      - name: Tests
+        run: npx vitest run
+      - name: Dependency audit (high and above)
+        run: npm audit --audit-level=high --omit=dev
+
+  migrate:
+    name: Migrate an empty Postgres
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18-alpine  # same major as docker-compose.yml
+        env:
+          POSTGRES_USER: impactiq
+          POSTGRES_PASSWORD: impactiq
+          POSTGRES_DB: impactiq
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U impactiq"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://impactiq:impactiq@localhost:5432/impactiq
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # pglite tests replay each migration on its own, so only a real Postgres
+      # starting from empty catches a migration that can't run in sequence.
+      - name: Apply every migration
+        run: npm run db:migrate
+      - name: Re-run is a no-op
+        run: npm run db:migrate
+      - name: Seed
+        run: npm run db:seed

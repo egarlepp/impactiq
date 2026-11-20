@@ -1,0 +1,12 @@
+-- v1.225.0: calendar-derived capacity (CLAUDE.md §12).
+--
+-- 'calendar_derived' — a 4th capacity_method where a group's target is
+-- auto-computed from members' own trailing real meeting load instead of a
+-- flat admin-set number (src/server/services/capacity/resolver.ts).
+--
+-- This ALTER TYPE is the ONLY statement in this file. Postgres cannot use a
+-- freshly-added enum value in the same transaction it was added in on some
+-- versions, so nothing here may reference 'calendar_derived' in SQL (no seed
+-- INSERT/UPDATE using it) — application code referencing it at runtime is
+-- unaffected, since that runs in a later, separate transaction entirely.
+ALTER TYPE capacity_method ADD VALUE IF NOT EXISTS 'calendar_derived';

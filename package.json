@@ -1,0 +1,45 @@
+{
+  "name": "impactiq",
+  "version": "1.479.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "workspaces": [
+    "src/client",
+    "src/server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=src/server\" \"npm run dev --workspace=src/client\"",
+    "build": "npm run build --workspace=src/client && npm run build --workspace=src/server",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/server/db/migrate-cli.ts",
+    "db:seed": "tsx drizzle/seed.ts",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "concurrently": "^10.0.7",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^4.1.1",
+    "zod": "^4.6.7"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0",
+    "nanoid": "^3.3.18",
+    "fast-uri": "^3.1.8",
+    "hono": "^4.13.18",
+    "qs": "^6.17.0",
+    "csv-parse": "^7.0.2",
+    "glob": "^14.0.3",
+    "minimatch": "^11.0.3"
+  }
+}

@@ -1,0 +1,6 @@
+ImpactIQ
+Copyright 2026 The ImpactIQ Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+Third-party packages it depends on are covered by their own licenses, listed in
+package-lock.json and in each package under node_modules after install.

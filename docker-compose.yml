@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    # Preload pg_stat_statements so the Admin → App Health page can surface
+    # per-query timings. Run `CREATE EXTENSION IF NOT EXISTS pg_stat_statements;`
+    # once against the DB after first start to register the view.
+    command: ['postgres', '-c', 'shared_preload_libraries=pg_stat_statements', '-c', 'pg_stat_statements.track=all']
+    environment:
+      # Single source of truth for the bundled Postgres container's own
+      # credentials — the app service's DATABASE_URL default below is
+      # composed FROM these same three vars (via Compose's own variable
+      # substitution, not env_file:), so changing a password here doesn't
+      # also require editing it separately in a connection-string literal.
+      POSTGRES_USER: ${POSTGRES_USER:-impactiq}
+      # No default: a published default password is a published password.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (openssl rand -hex 24)}
+      POSTGRES_DB: ${POSTGRES_DB:-impactiq}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Reachable from this machine only (for `npm run dev` on the host). Docker
+    # writes its own firewall rules, so a plain '5432:5432' would publish the
+    # database to the whole network even behind a host firewall.
+    ports:
+      - '127.0.0.1:5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-impactiq}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # Was a hardcoded literal that always won over whatever DATABASE_URL a
+      # user put in .env (Compose's `environment:` takes precedence over
+      # `env_file:` for the same key) — silently defeating README's "point
+      # at an external Postgres by overriding DATABASE_URL" instructions.
+      # ${DATABASE_URL} is resolved by Compose itself from the same .env
+      # file (its variable-substitution pass, separate from env_file:), so
+      # an override now actually takes effect. The fallback after `:-`
+      # composes from the SAME POSTGRES_USER/PASSWORD/DB vars the bundled
+      # Postgres service above reads, so the POSTGRES_PASSWORD you set in
+      # .env (required: Compose refuses to start without it) flows through
+      # to both places without duplicating the full connection string.
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-impactiq}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-impactiq}}
+    ports:
+      - '3000:3000'
+
+volumes:
+  postgres_data:

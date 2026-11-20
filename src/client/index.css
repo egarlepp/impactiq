@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tell the browser which UA palette to paint native controls with, so
+   date/datetime-local/time picker indicators, number spinners, and
+   scrollbars follow the app theme instead of defaulting to a black-on-dark
+   calendar glyph. Applied on the root element that carries the `.dark`
+   class toggled by the theme switcher. */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+
+/* Themeable card / surface background. Used in place of `bg-white dark:bg-gray-900`
+   for elevated panels so a theme can shift surfaces lighter or darker than the page bg. */
+.theme-card {
+  background-color: var(--color-surface-light, #ffffff);
+}
+.dark .theme-card {
+  background-color: var(--color-surface-dark, #111827);
+}
+
+/* Themeable link color. Used for anchors and clickable text that aren't full buttons. */
+.theme-link {
+  color: var(--color-link-light, #2563eb);
+}
+.dark .theme-link {
+  color: var(--color-link-dark, #60a5fa);
+}
+.theme-link:hover {
+  text-decoration: underline;
+}
+
+/* v1.241.0: Tentative (tentativelyAccepted) RSVP state, applied to activity
+   cards, suggested-meeting cards, and calendar event blocks alike.
+   
+   A diagonal hatch rather than a color change on purpose: the card background
+   already encodes the activity TYPE (per-type color) and the left border
+   already encodes approval state, so neither was available. The pattern
+   layers over whatever background the element already has, so a tentative
+   Demo still reads as a Demo.
+
+   Deliberately low-contrast — this is an ambient qualifier, not a warning.
+   The dark-mode variant uses a light overlay at even lower alpha, since the
+   same alpha over a dark surface reads far louder. */
+.stripe-tentative {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(79, 70, 229, 0.10) 0,
+    rgba(79, 70, 229, 0.10) 3px,
+    transparent 3px,
+    transparent 8px
+  );
+}
+.dark .stripe-tentative {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(199, 210, 254, 0.07) 0,
+    rgba(199, 210, 254, 0.07) 3px,
+    transparent 3px,
+    transparent 8px
+  );
+}
+
+/* Markdown surface for rendered notes. Tailwind v4 in this project
+   doesn't bundle the typography plugin, so `prose` classes are no-ops
+   and ReactMarkdown output renders as plain text. This scope styles
+   the common elements (headings, bold, italic, lists, code, links) at
+   the sizes we use in Notes drawers and cards. */
+/* Force a real color so the rendered markdown never depends on the
+   wrapper's inherited value. Fixes a dark-mode bug where the outer div
+   set dark:text-gray-200 but ReactMarkdown's <p>/<li> children were
+   somehow rendering with the default text-gray-700 (near-black on the
+   near-black note-viewer surface). */
+.md-body { color: #374151; font-size: 0.875rem; line-height: 1.4; }
+.dark .md-body { color: #e5e7eb; }
+.md-body p,
+.md-body li,
+.md-body td,
+.md-body th,
+.md-body blockquote { color: inherit; }
+.md-body p { margin: 0.25rem 0; }
+.md-body p:first-child { margin-top: 0; }
+.md-body p:last-child { margin-bottom: 0; }
+.md-body strong, .md-body b { font-weight: 600; }
+.md-body em, .md-body i { font-style: italic; }
+/* Headings inherit body color so light-on-dark works out of the box.
+   Force it explicitly so a container that only set `text-gray-700`
+   doesn't leave dark headings on a dark surface. */
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4,
+.md-body h5,
+.md-body h6 { color: #111827; }
+.dark .md-body h1,
+.dark .md-body h2,
+.dark .md-body h3,
+.dark .md-body h4,
+.dark .md-body h5,
+.dark .md-body h6 { color: #f3f4f6; }
+.md-body h1 { font-size: 1.05rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+.md-body h2 { font-size: 1rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+.md-body h3 { font-size: 0.95rem; font-weight: 600; margin: 0.5rem 0 0.25rem; }
+.md-body h4 { font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem; }
+.md-body ul { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
+.md-body ol { list-style: decimal; padding-left: 1.25rem; margin: 0.25rem 0; }
+.md-body li { margin: 0.125rem 0; }
+.md-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  padding: 0.05rem 0.25rem;
+  border-radius: 0.25rem;
+  /* On light surfaces: subtle slate wash. On dark: a distinctly lighter
+     panel so inline code reads as a chip, not a phantom smudge. */
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+.dark .md-body code {
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+.md-body pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  overflow-x: auto;
+  margin: 0.375rem 0;
+}
+.dark .md-body pre {
+  background-color: #0f172a;
+  color: #e5e7eb;
+}
+.md-body pre code { background: transparent; padding: 0; color: inherit; }
+.md-body a { color: var(--color-link-light, #2563eb); text-decoration: underline; }
+.dark .md-body a { color: var(--color-link-dark, #60a5fa); }
+.md-body blockquote {
+  border-left: 3px solid rgba(148, 163, 184, 0.4);
+  padding-left: 0.75rem;
+  color: rgba(75, 85, 99, 0.85);
+  margin: 0.375rem 0;
+}
+.dark .md-body blockquote { color: rgba(209, 213, 219, 0.85); }
+/* GFM tables — remark-gfm emits real <table>; without styling they look
+   like unaligned lines. */
+.md-body table { border-collapse: collapse; margin: 0.5rem 0; font-size: 0.8125rem; }
+.md-body th,
+.md-body td { border: 1px solid #e5e7eb; padding: 0.25rem 0.5rem; text-align: left; }
+.md-body th { background-color: #f9fafb; font-weight: 600; }
+.dark .md-body th,
+.dark .md-body td { border-color: #374151; }
+.dark .md-body th { background-color: #1f2937; }
+.md-body hr { border: 0; border-top: 1px solid #e5e7eb; margin: 0.75rem 0; }
+.dark .md-body hr { border-top-color: #374151; }
+
+/* v1.255.5: opt-in "comfortably spaced" variant for Markdown that IS the
+   primary content of a page section (Guide's Distinctions, its admin
+   Preview) rather than a compact side panel. `.md-body`'s own margins
+   above (0.125–0.5rem) are tuned for the small, dense Notes drawer.
+   A prior attempt used Tailwind arbitrary child-selector utilities
+   (`[&_p]:mb-3`) layered via `className` — those compile into Tailwind's
+   `@layer utilities`, and this plain, unlayered `.md-body` block always
+   wins the cascade over anything in a `@layer` at equal specificity
+   (unlayered CSS outranks layered CSS regardless of source order or
+   utility specificity), so the extra margin never rendered. Fixed by
+   adding real overrides here instead, at `.md-body.md-body-spaced`
+   (two classes) so they out-specify the plain `.md-body` single-class
+   rules above them regardless of order. */
+.md-body.md-body-spaced p { margin: 0.75rem 0; }
+.md-body.md-body-spaced p:first-child { margin-top: 0; }
+.md-body.md-body-spaced p:last-child { margin-bottom: 0; }
+.md-body.md-body-spaced h1,
+.md-body.md-body-spaced h2,
+.md-body.md-body-spaced h3,
+.md-body.md-body-spaced h4 { margin: 1rem 0 0.375rem; }
+.md-body.md-body-spaced h1:first-child,
+.md-body.md-body-spaced h2:first-child,
+.md-body.md-body-spaced h3:first-child,
+.md-body.md-body-spaced h4:first-child { margin-top: 0; }
+.md-body.md-body-spaced ul,
+.md-body.md-body-spaced ol { margin: 0.75rem 0; }
+.md-body.md-body-spaced ul:first-child,
+.md-body.md-body-spaced ol:first-child { margin-top: 0; }
+.md-body.md-body-spaced ul:last-child,
+.md-body.md-body-spaced ol:last-child { margin-bottom: 0; }
+.md-body.md-body-spaced li { margin: 0.25rem 0; }
+.md-body.md-body-spaced blockquote { margin: 0.75rem 0; }
+.md-body.md-body-spaced blockquote:first-child { margin-top: 0; }
+.md-body.md-body-spaced blockquote:last-child { margin-bottom: 0; }
+.md-body.md-body-spaced table { margin: 0.75rem 0; }
+.md-body.md-body-spaced table:first-child { margin-top: 0; }
+.md-body.md-body-spaced table:last-child { margin-bottom: 0; }
+.md-body.md-body-spaced pre { margin: 0.75rem 0; }
+.md-body.md-body-spaced pre:first-child { margin-top: 0; }
+.md-body.md-body-spaced pre:last-child { margin-bottom: 0; }
+.md-body.md-body-spaced hr { margin: 1rem 0; }
+
+/* v1.420.0: printing. The app shell is a fixed-height flex layout whose pages
+   scroll inside their own containers, so a printout would stop at the first
+   screenful. In print, every container grows to its content instead, and the
+   chrome (sidebar, page header, banners) is hidden with print:hidden classes
+   where it is rendered. */
+@media print {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  #root .h-screen,
+  #root .h-full {
+    height: auto !important;
+  }
+  #root .overflow-hidden,
+  #root .overflow-auto,
+  #root .overflow-y-auto,
+  #root .overflow-x-auto {
+    overflow: visible !important;
+  }
+}

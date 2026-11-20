@@ -1,0 +1,70 @@
+// Shared constants used across capacity + cost group admin UIs.
+//
+// ROLE_TYPES: suggestion list surfaced via a <datalist> so admins can pick
+//   a canonical label without losing the ability to type a custom one.
+// CURRENCIES: top ~30 world currencies for the cost-group dropdown.
+
+export const ROLE_TYPES = [
+  'Solutions Engineer',
+  'Sales Engineer',
+  'Solutions Architect',
+  'Field Engineer (FDE)',
+  'Specialist Engineer',
+  'Principal Engineer',
+  'Enterprise Architect',
+  'Solutions Consultant',
+  'Pre-Sales Engineer',
+  'Post-Sales Engineer',
+  'Implementation Engineer',
+  'Enablement Engineer',
+  'Support Engineer',
+  'Customer Success Manager',
+  'Technical Account Manager',
+  'Channel SE',
+  'Partner SE',
+  'Regional Specialist',
+  'Product Specialist',
+  'Account Executive',
+  'Sales Development Rep',
+  'Business Development Rep',
+  'Team Lead',
+  'Manager',
+  'Director',
+  'VP',
+  'Consultant',
+] as const
+
+// Top 30 world currencies (ISO 4217) — ordered by rough global trading
+// volume so the most common ones surface first in the dropdown.
+export const CURRENCIES: Array<{ code: string; name: string }> = [
+  { code: 'USD', name: 'US Dollar' },
+  { code: 'EUR', name: 'Euro' },
+  { code: 'JPY', name: 'Japanese Yen' },
+  { code: 'GBP', name: 'British Pound' },
+  { code: 'CNY', name: 'Chinese Yuan' },
+  { code: 'AUD', name: 'Australian Dollar' },
+  { code: 'CAD', name: 'Canadian Dollar' },
+  { code: 'CHF', name: 'Swiss Franc' },
+  { code: 'HKD', name: 'Hong Kong Dollar' },
+  { code: 'SGD', name: 'Singapore Dollar' },
+  { code: 'SEK', name: 'Swedish Krona' },
+  { code: 'KRW', name: 'South Korean Won' },
+  { code: 'NOK', name: 'Norwegian Krone' },
+  { code: 'NZD', name: 'New Zealand Dollar' },
+  { code: 'INR', name: 'Indian Rupee' },
+  { code: 'MXN', name: 'Mexican Peso' },
+  { code: 'TWD', name: 'Taiwan Dollar' },
+  { code: 'ZAR', name: 'South African Rand' },
+  { code: 'BRL', name: 'Brazilian Real' },
+  { code: 'DKK', name: 'Danish Krone' },
+  { code: 'PLN', name: 'Polish Złoty' },
+  { code: 'THB', name: 'Thai Baht' },
+  { code: 'IDR', name: 'Indonesian Rupiah' },
+  { code: 'HUF', name: 'Hungarian Forint' },
+  { code: 'CZK', name: 'Czech Koruna' },
+  { code: 'ILS', name: 'Israeli Shekel' },
+  { code: 'CLP', name: 'Chilean Peso' },
+  { code: 'PHP', name: 'Philippine Peso' },
+  { code: 'AED', name: 'UAE Dirham' },
+  { code: 'SAR', name: 'Saudi Riyal' },
+]

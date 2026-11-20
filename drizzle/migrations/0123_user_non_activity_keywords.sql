@@ -1,0 +1,17 @@
+-- v1.243.0: per-user Non-Activity subject keywords.
+--
+-- The team-scoped equivalent already exists (keyword_rules with
+-- action='mark_non_activity'), but that applies to everyone on the team. This
+-- is the personal layer: a contributor's own recurring meetings ("1:1 with
+-- manager", "gym", a specific standup) that nobody else should have filtered
+-- out of their list.
+--
+-- Stored on users rather than in its own table because it's a single
+-- unordered list of strings with no per-entry metadata — no priority, no
+-- match-field choice, no active/inactive. Modelling it as rows would add a
+-- join and a lifecycle for data the UI edits as one comma-separated field.
+--
+-- NULL (not an empty array) is the "never configured" state, so an empty list
+-- and an absent list read identically in the matcher without needing a
+-- backfill.
+ALTER TABLE "users" ADD COLUMN "non_activity_keywords" text[];
