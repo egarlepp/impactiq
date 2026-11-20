@@ -1,6 +1,6 @@
 # ImpactIQ — Product Requirements Document (PRD)
 **Version:** 2.4
-**Owner:** Eric, Senior Director Solutions Engineering
+**Owner:** the repository owner
 **Repo:** https://github.com/egarlepp/impactiq
 **Status:** Shipped and in production — app version v1.349.6
 **Last Updated:** September 2026

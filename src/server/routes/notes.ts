@@ -160,8 +160,8 @@ async function enrichNotes(rows: RawRow[], callerId: string, callerIsAppAdmin: b
     // v1.129.0: owner-only. App Admins can still SEE every note (and
     // still see private ones) but the Edit / Delete / Private / AI /
     // Push buttons only enable for the note's original author. That's
-    // what the user asked for after seeing Solutions Engineering
-    // (also an App Admin) get a full toolbar on Eric Garlepp's notes.
+    // what the user asked for after seeing another App Admin get a
+    // full toolbar on someone else's notes.
     canEdit: !!r.createdBy && r.createdBy === callerId,
   }))
 }

@@ -22,7 +22,7 @@ import { appThemes } from '../../../../drizzle/schema.js'
 import { eq } from 'drizzle-orm'
 
 export interface RenderEmailInput {
-  greetingName: string   // "Eric" — rendered as "Hello Eric,"
+  greetingName: string   // "Jane" — rendered as "Hello Jane,"
   subject: string        // used for the <title> only; body must not repeat it
   bodyHtml: string       // caller-supplied HTML for the middle area
   bodyText: string       // caller-supplied plain-text mirror

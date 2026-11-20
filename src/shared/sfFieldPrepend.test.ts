@@ -3,15 +3,15 @@ import { computeInitials, formatEntry, buildPrependedValue, computeCapacity } fr
 
 describe('computeInitials', () => {
   it('uppercases first+last initial', () => {
-    expect(computeInitials('Eric', 'Garlepp')).toBe('EG')
+    expect(computeInitials('Jane', 'Doe')).toBe('JD')
   })
   it('falls back to ? for a missing name rather than inventing one', () => {
-    expect(computeInitials('', 'Garlepp')).toBe('?G')
-    expect(computeInitials('Eric', null)).toBe('E?')
+    expect(computeInitials('', 'Doe')).toBe('?D')
+    expect(computeInitials('Jane', null)).toBe('J?')
     expect(computeInitials(null, undefined)).toBe('??')
   })
   it('trims whitespace before taking the first character', () => {
-    expect(computeInitials('  Eric', '  Garlepp')).toBe('EG')
+    expect(computeInitials('  Jane', '  Doe')).toBe('JD')
   })
 })
 

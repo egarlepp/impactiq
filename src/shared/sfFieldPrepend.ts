@@ -16,7 +16,7 @@
 // assumed.
 
 /**
- * `EG` from "Eric"/"Garlepp". Missing or blank names fall back to `?`
+ * `JD` from "Jane"/"Doe". Missing or blank names fall back to `?`
  * rather than fabricating an initial — never silently invents identity.
  */
 export function computeInitials(firstName: string | null | undefined, lastName: string | null | undefined): string {

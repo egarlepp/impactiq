@@ -214,7 +214,7 @@ themesAdminRoutes.post('/themes/email-preview', requireAppAdmin, async (req, res
     hostedLogoUrl: null as string | null,
   }
   const rendered = renderEmailTemplate({
-    greetingName: parsed.data.greetingName ?? req.user?.displayName ?? 'Eric',
+    greetingName: parsed.data.greetingName ?? req.user?.displayName ?? 'Jane',
     subject: parsed.data.subject ?? 'ImpactIQ: sample notification',
     bodyHtml: parsed.data.bodyHtml ?? '<p style="margin:0 0 12px 0;">This is a preview of how notification emails will look with the current theme settings. The body text renders here, compact spacing between paragraphs.</p><p style="margin:0 0 12px 0;">Any HTML the sender includes will appear in this middle area.</p>',
     bodyText: parsed.data.bodyText ?? 'This is a preview of how notification emails will look with the current theme settings.',

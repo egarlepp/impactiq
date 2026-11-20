@@ -83,7 +83,7 @@
   admin preview endpoint (`GET /teams/:teamId/nudge-rules/:ruleId/preview`) now additionally
   returns `activityDiagnostics` — every sampled member's most recent `activities.created_at`
   for the team, computed the same way `no_activity_days` and `{days_since_activity}` do — and
-  the Preview modal renders it as a plain list ("Eric Garlepp — today") whenever the previewed
+  the Preview modal renders it as a plain list ("Jane Doe — today") whenever the previewed
   rule's `triggerType` is `no_activity_days`, gated to that trigger only so other rule types
   don't pay for an unused query. This turns "trust the logic" into "here's the literal number,
   judge for yourself" — most likely explanation for a fresh/test team is that the *app itself*
@@ -234,8 +234,7 @@
   condition evaluating true and the notification actually reaching the response — the next area
   to inspect with this data in hand, and not one this investigation has looked at closely yet.
 - **Nudge Rules Preview: per-member dismissal state (v1.305)** — direct follow-up after the
-  admin reported the real notification bell showing this exact symptom for a real user (Eric
-  Garlepp): other nudge types (`stage_no_type`, `type_no_followup`) delivered correctly, but
+  admin reported the real notification bell showing this exact symptom for a real user: other nudge types (`stage_no_type`, `type_no_followup`) delivered correctly, but
   `no_activity_days` never did, even with `recentCount: 0` now confirmed for him via v1.304's
   diagnostic — proving the trigger's own query says he should match. Re-reading `evaluateNudges()`
   end to end (the `no_activity_days` emit, the leader-rollup pass, and the final rich-token
@@ -2165,7 +2164,7 @@
   `defaultActivityTypeStyles.test.ts` (every icon name exists in lucide-react; a new team gets
   all ten styled).
 - **Guide lists every active Activity Type with its icon + existing installs backfilled (v1.377.0)** —
-  Eric reported the Guide showing no icons. The page already rendered `icon`/`color` from
+  The owner reported the Guide showing no icons. The page already rendered `icon`/`color` from
   `team_activity_types`; the installed rows were simply blank, since v1.376.0 only styled new
   installs/new teams and needed a Seed Default Content click on existing ones. Migration
   `0153_default_activity_type_styles.sql` now fills blank icon/color on the ten default-named types
@@ -2234,7 +2233,7 @@
 - **shell-quote critical alert fixed by bumping concurrently (v1.380.2)** — Dependabot alert #30: `shell-quote` 1.9.0 (command injection, fixed in 1.11.0) came in only through the dev dependency `concurrently@9.2.4`, which pins it exactly, so Dependabot couldn't bump it alone. `concurrently` 9.2.5 pins `shell-quote` 1.12.0, so the fix is a same-major bump (`^9.2.5`), no `overrides` entry. Dev-only (used by `npm run dev`), never in the production image. `npm audit`: 0 vulnerabilities; `npm run dev` starts both workspaces.
 - **Browser tab title (v1.380.3)** — `src/client/index.html`'s `<title>` reads "ImpactIQ | Activity to Impact" instead of just "ImpactIQ".
 - **App-wide Campaigns switch, first HubSpot groundwork (v1.381.0)** — Phase 1a of the HubSpot plan (an install-wide either/or alternative to Salesforce; the plan is a Claude Doc, see project memory `hubspot-integration-plan`). New `system_settings` key `crm_features` (`{campaignsEnabled}`, default `true`, no migration) read through `services/crm/features.ts` (`getCrmFeatures()`, 30s cache, cleared on write and after a backup restore) and shared helpers in `src/shared/crmFeatures.ts`. Admin → Integrations → **CRM features** card (`CrmFeaturesCard.tsx`, App Admin, `GET`/`PUT /api/admin/integrations/crm-features`, audited `integration.crm_features.update` with `{before, after}`); any signed-in user reads it via `GET /api/crm/features` into the `useCrmFeatures()` store. Off means: the Campaign tab in `SfSearch` is hidden, `/api/salesforce/search/campaigns` returns 403 `errors.crm.campaigns_disabled`, Most Expensive drops its Campaigns scope, Team-of-Teams Rollup drops its Campaigns column, and the Account include-all and note-entity Campaign SOQL lookups are skipped. **Enforced server-side, not just hidden**: `POST`/`PATCH /api/activities` reject a new or changed Campaign link (`isBlockedCampaignLink()`), but an activity already linked to a Campaign keeps that link on save, so turning the switch off never strands or rewrites existing data. Built CRM-neutral on purpose: the same switch will gate HubSpot Marketing Hub campaigns once HubSpot lands. Tests: `crmFeatures.test.ts` (blocking rule) and `services/crm/features.test.ts` (pglite round-trip).
-- **App-wide Leads switch (v1.382.0)** — Eric asked whether the v1.381.0 Campaigns switch covered Leads; it didn't, so a second switch now sits on the same Admin → Integrations → CRM features card. `crm_features` gains `leadsEnabled` (default `true`, same `system_settings` row, no migration; a stored row without the key reads as on). Leads live in the Who slot (`sfWhoType = 'Lead'`), so the blocking rule is a sibling, `isBlockedLeadLink()`, and both rules are combined by `blockedCrmLinkError()` (`src/shared/crmFeatures.ts`), which `POST`/`PATCH /api/activities` use to return 403 `errors.crm.campaigns_disabled` or `errors.crm.leads_disabled`. Same keep-existing-links contract as Campaigns. Off also means: `/api/salesforce/search/leads` returns 403, the Lead tab in `SfSearch` and the Lead line in `SfRelationshipHelp` are hidden, Most Expensive drops its Leads scope, Team-of-Teams Rollup drops its Leads column, and the account drill-in skips the converted-Lead SOQL lookup. Dashboards that only break down already-saved rows (Account / Opportunity Concentration, the SF Activities modal breakdown, My Notes' Lead bucket) still show existing Lead data. `CrmFeaturesCard.tsx` now renders one row per switch from a small list, so a third switch is one more entry.
+- **App-wide Leads switch (v1.382.0)** — the owner asked whether the v1.381.0 Campaigns switch covered Leads; it didn't, so a second switch now sits on the same Admin → Integrations → CRM features card. `crm_features` gains `leadsEnabled` (default `true`, same `system_settings` row, no migration; a stored row without the key reads as on). Leads live in the Who slot (`sfWhoType = 'Lead'`), so the blocking rule is a sibling, `isBlockedLeadLink()`, and both rules are combined by `blockedCrmLinkError()` (`src/shared/crmFeatures.ts`), which `POST`/`PATCH /api/activities` use to return 403 `errors.crm.campaigns_disabled` or `errors.crm.leads_disabled`. Same keep-existing-links contract as Campaigns. Off also means: `/api/salesforce/search/leads` returns 403, the Lead tab in `SfSearch` and the Lead line in `SfRelationshipHelp` are hidden, Most Expensive drops its Leads scope, Team-of-Teams Rollup drops its Leads column, and the account drill-in skips the converted-Lead SOQL lookup. Dashboards that only break down already-saved rows (Account / Opportunity Concentration, the SF Activities modal breakdown, My Notes' Lead bucket) still show existing Lead data. `CrmFeaturesCard.tsx` now renders one row per switch from a small list, so a third switch is one more entry.
 - **CRM provider layer, HubSpot phase 1b (v1.383.0)** — see §9's new "CRM provider layer". An install-wide
   `crm_provider` setting (Salesforce by default, no UI yet) and a `CrmProvider` interface with Salesforce behind it as a
   thin adapter. Salesforce search, the hover preview, activity write-back and the snapshot refresh now go through it,
@@ -2256,7 +2255,7 @@
   out), auto-linked when exactly one CriteriaIQ project points at the Evaluation, otherwise chosen once per Evaluation
   (new `criteriaiq_evaluation_links` table, migration 0154), with CRM/CriteriaIQ disagreements flagged, not resolved.
   New keys in all 7 locales; pglite tests for the link rules, unit tests for the mismatch check and criteria counting.
-- **Project source card renamed "Projects (POC|POV)" (v1.386.1)** — Eric's wording for what the card governs; the title changed in all 7 locales, nothing else.
+- **Project source card renamed "Projects (POC|POV)" (v1.386.1)** — the owner's wording for what the card governs; the title changed in all 7 locales, nothing else.
 - **Projects can be turned Off (v1.387.0)** — see §9's "Projects Off". The Off choice on Admin → Integrations → Projects
   (POC|POV) is now offered: it hides the Project picker, Project chips and panels, Engineer Notes posting and the Won w/o
   POC / Project-Specific Costing dashboards, refuses new Project links on the server, and pauses the Project parts of the
@@ -2282,7 +2281,7 @@
   missing) and Sync owners all worked. Two fixes from that run: the tickets capability now names the
   `crm.objects.tickets.read` scope (the old private-app name `tickets` doesn't appear for service keys), and the card
   shows the portal's domain when HubSpot returns no portal name.
-- **HubSpot card always listed (v1.389.2)** — Eric couldn't find anywhere to enter HubSpot details: the card was
+- **HubSpot card always listed (v1.389.2)** — the owner couldn't find anywhere to enter HubSpot details: the card was
   hidden while Salesforce is the CRM, and HubSpot can't be chosen until phase 2b. The card now always sits right after
   the Salesforce card (or in its place when Salesforce isn't the CRM), laid out like the other integration cards
   (Configured badge, Configure toggle), with a note when Salesforce is still the CRM and a "Scopes to grant" list shown
@@ -2290,10 +2289,10 @@
   redirect URL, since there's no OAuth). Scope names moved to the shared `HUBSPOT_CAPABILITY_SCOPES` map, used by both
   the access check and the card. Browser-checked against a stubbed backend.
 - **HubSpot search, previews and write-back + Integrations page regrouped (v1.390.0)** — see §9's "HubSpot provider".
-  HubSpot is now a selectable CRM (Eric: "Hubspot still says coming soon in CRM"): Deal/Company/Contact search (Leads
+  HubSpot is now a selectable CRM (the owner: "Hubspot still says coming soon in CRM"): Deal/Company/Contact search (Leads
   and Campaigns when the portal has them), Deal/Company hover previews, and meeting/task write-back with associations
   and retry. Built to work on any portal and tier, not tuned to the test portal; Leads and Campaigns are unverified
-  live. Admin → Integrations, per Eric's request: the CRM card is now a collapsible group holding the Salesforce,
+  live. Admin → Integrations, per the owner's request: the CRM card is now a collapsible group holding the Salesforce,
   HubSpot, admin Salesforce connection and CRM features cards (open by default), and Projects (POC|POV) and Rate
   Limiting are collapsible, collapsed by default, with Active/Inactive and Locked/Unlocked pills in the header (shared
   `CollapsibleCard.tsx`). Tests: `hubspot/search.test.ts` (filters, mapping, associations, optional features) and
@@ -2305,22 +2304,22 @@
   properties a sync would send; Sample record reads one real record. Built for any portal: nothing assumes the test
   portal's properties. Also translated 15 keys on that page that only ever had English fallbacks (Direction, Active,
   field search, object list notes). 19 new tests; browser-checked against a stubbed backend in light and dark mode.
-- **AI Assistant: multi-provider AI (v1.392.0)** — see §14's AI Assistant bullet. Eric asked for VectorIQ's AI
+- **AI Assistant: multi-provider AI (v1.392.0)** — see §14's AI Assistant bullet. The owner asked for VectorIQ's AI
   Assistant page with CriteriaIQ's provider flexibility, as groundwork for more AI features. Admin → Integrations → AI
   Assistant connects Anthropic, Azure OpenAI, OpenAI, Bedrock, Foundry, Gemini or xAI, with a master switch, monthly
   budget, usage log and per-feature routing; activity classification, note organize/link suggestions and Ask My Notes
   all run through one gateway. Migration 0156 copies a configured Azure OpenAI row into `ai_providers` as the active
-  default, turns the assistant on, and deletes the old row; the `AZURE_OPENAI_*` env fallback is gone (Eric: not needed
+  default, turns the assistant on, and deletes the old row; the `AZURE_OPENAI_*` env fallback is gone (the owner: not needed
   for backward compatibility), so an install that only set those env vars re-enters its provider on the new page.
   Calendar classifications are cached (`ai_classification_cache`, culled after 90 days unused), and `ai_requests` is
   culled after `AI_REQUESTS_RETENTION_DAYS` (395). Tests: `services/ai/gateway.test.ts` (routing, budget + monthly
   email, usage cost, the cache, and the migration copy).
-- **AI Assistant usage totals (v1.392.1)** — Eric asked for VectorIQ's usage tiles: the Usage this month card on Admin → Integrations → AI Assistant now opens with Requests, Input tokens, Output tokens and Estimated cost (spent / budget when a budget is set), summed client-side from the existing `month.byProvider` rows (no API change), plus a privacy line and a cost-estimate note. The per-provider table shows only with 2+ providers used this month.
+- **AI Assistant usage totals (v1.392.1)** — the owner asked for VectorIQ's usage tiles: the Usage this month card on Admin → Integrations → AI Assistant now opens with Requests, Input tokens, Output tokens and Estimated cost (spent / budget when a budget is set), summed client-side from the existing `month.byProvider` rows (no API change), plus a privacy line and a cost-estimate note. The per-provider table shows only with 2+ providers used this month.
 - **Integrations page order (v1.392.2)** — Admin → Integrations now reads Okta SSO, Azure SSO, Microsoft Graph (Outlook), Email Configuration, the CRM section, Projects (POC|POV), Slack, App Updates, Rate Limiting (`BEFORE_CRM_KEYS` in `IntegrationsStatus.tsx` splits `INTEGRATIONS` around the CRM group). The CRM section (`CrmProviderCard.tsx`) now starts collapsed, matching Projects and Rate Limiting.
-- **HubSpot Deal snapshot refresh + Deal filters, HubSpot phase 3 (v1.393.0)** — see §9's new bullet. Eric asked for phases 3 and 4; this is phase 3 as its own PR. A nightly job keeps HubSpot Deal stage, forecast, amount, close date, owner, SE and Company current on logged activities, the dashboard Refresh button now runs it, the Deal Stage / Forecast filters list the portal's real stages grouped by pipeline, and TCE By Account works without Salesforce. Live-checked against test portal 247756533 (deal 356553095874 refreshed with its stage, amount, close date and Company). 8 new tests in `hubspot/refreshSnapshots.test.ts`; browser-checked against a stubbed backend in light and dark mode. Removed `errors.hubspot.snapshot_refresh_unavailable`.
+- **HubSpot Deal snapshot refresh + Deal filters, HubSpot phase 3 (v1.393.0)** — see §9's new bullet. The owner asked for phases 3 and 4; this is phase 3 as its own PR. A nightly job keeps HubSpot Deal stage, forecast, amount, close date, owner, SE and Company current on logged activities, the dashboard Refresh button now runs it, the Deal Stage / Forecast filters list the portal's real stages grouped by pipeline, and TCE By Account works without Salesforce. Live-checked against test portal 247756533 (deal 356553095874 refreshed with its stage, amount, close date and Company). 8 new tests in `hubspot/refreshSnapshots.test.ts`; browser-checked against a stubbed backend in light and dark mode. Removed `errors.hubspot.snapshot_refresh_unavailable`.
 - **Tests read the source, not a stale build (v1.393.1)** — imports name the emitted `.js` file, and Vite only maps `./x.js` to `./x.ts` when no `x.js` exists, so a local `tsc` build that left a gitignored `drizzle/schema.js` behind made vitest load that old copy. On a build predating the AI tables, 8 tests in `services/ai/gateway.test.ts` failed with `delete from ` (undefined table). A `prefer-ts-source` resolver in `vitest.config.ts` now picks the sibling `.ts` whenever one exists. No app code changed.
-- **HubSpot notes push, Support Tickets, CRM Sync, HubSpot phase 4 (v1.394.0)** — see §9's new bullet. Second half of Eric's "phases 3 and 4". Notes push to a HubSpot Deal or Company, the Support Tickets picker on HubSpot Tickets (no setup needed: standard properties, closed from pipeline stages), HubSpot meeting/task deleted when its activity is deleted, and CRM Sync explaining HubSpot errors in plain words, all in 7 languages. Live-checked against test portal 247756533: a note pushed onto deal 356553095874 and associated, two test tickets on the Company found by Company scope (closed one hidden until Show Closed) and by text; all test records deleted afterwards. New tests: `hubspot/notesPush.test.ts` (7), `hubspot/tickets.test.ts` (10), `deleteHubspotEngagement` (3). Browser-checked CRM Sync issues, the ticket picker and the admin ticket form against a stubbed backend in light and dark mode.
-- **Leftover Salesforce wording under HubSpot + AI link suggestions on HubSpot (v1.395.0)** — see §9's new bullet. Start of Eric's "continue on with project" after phase 4. HubSpot installs no longer see "Salesforce" on the activity form, hover preview, deleted-meeting review, Outlook-only hint or My Notes; the preview links to the HubSpot record; My Notes' Find matching records works through HubSpot. Also found and fixed: 33 `admin.activity_types.sf_extras_*` keys and the extras badges/field types had never been translated in any locale (English defaults everywhere). New test `routes/ai.linkSuggestions.test.ts` (2).
+- **HubSpot notes push, Support Tickets, CRM Sync, HubSpot phase 4 (v1.394.0)** — see §9's new bullet. Second half of the owner's "phases 3 and 4". Notes push to a HubSpot Deal or Company, the Support Tickets picker on HubSpot Tickets (no setup needed: standard properties, closed from pipeline stages), HubSpot meeting/task deleted when its activity is deleted, and CRM Sync explaining HubSpot errors in plain words, all in 7 languages. Live-checked against test portal 247756533: a note pushed onto deal 356553095874 and associated, two test tickets on the Company found by Company scope (closed one hidden until Show Closed) and by text; all test records deleted afterwards. New tests: `hubspot/notesPush.test.ts` (7), `hubspot/tickets.test.ts` (10), `deleteHubspotEngagement` (3). Browser-checked CRM Sync issues, the ticket picker and the admin ticket form against a stubbed backend in light and dark mode.
+- **Leftover Salesforce wording under HubSpot + AI link suggestions on HubSpot (v1.395.0)** — see §9's new bullet. Start of the owner's "continue on with project" after phase 4. HubSpot installs no longer see "Salesforce" on the activity form, hover preview, deleted-meeting review, Outlook-only hint or My Notes; the preview links to the HubSpot record; My Notes' Find matching records works through HubSpot. Also found and fixed: 33 `admin.activity_types.sf_extras_*` keys and the extras badges/field types had never been translated in any locale (English defaults everywhere). New test `routes/ai.linkSuggestions.test.ts` (2).
 - **HubSpot Campaigns + Leads follow the portal (v1.396.0, HubSpot phase 5)** — see §9's new bullet. Campaign and Lead tabs, links and searches now stay hidden on a HubSpot portal whose access check found them missing, with an explanation on Admin → CRM features; a Company's Include All drill-in rolls in its linked Leads; a campaign-linked meeting is added to the HubSpot campaign as an asset. Lead/Campaign search and linking (phase 2b) and the Most Expensive / Team-of-Teams Lead and Campaign scopes (local data) already worked on HubSpot. Also fixed while there: `GET /api/activities/account-drill` trusted `?teamId=` unchecked (any signed-in user could read another team's submitted activities on an Account); it now 403s unless the team is in `getAccessibleTeamIds()`. Tests: 5 new in `services/crm/features.test.ts`, `routes/activities.accountDrill.test.ts` (3), 5 campaign tests in `hubspot/writeback.test.ts`.
 - **HubSpot Assigned SE + ACV write-back (v1.397.0, HubSpot phase 6a)** — see §9's new bullet. The activity form's Assigned SE picker used to call the Salesforce routes on HubSpot (409); it now reads and writes the team's mapped `assigned_se_write` Deal property, limited to users matched to a HubSpot owner. An activity's ACV goes onto its HubSpot Deal through a writable `acv` mapping. Fixed while testing: the owner option list first flagged every owner as an ImpactIQ user, because an unqualified `email` in an `EXISTS` subquery resolved to the inner `users` table. Tests: `hubspot/dealFields.test.ts` (11), `routes/crm.assignedSe.test.ts` (6), 3 ACV tests in `hubspot/writeback.test.ts`, deal write checks in `hubspot/mappingValidation.test.ts`.
 - **HubSpot Projects (v1.398.0, HubSpot phase 6b)** — see §9's new bullet. On HubSpot, the Project picker, Project panel, Engineer Notes / Next Steps posting, the Project hover preview and the nightly Project refresh used to stop at the Salesforce routes (409); they now run against HubSpot's standard Projects object or a custom object, chosen per Activity Type and driven by the team's `eval_*` mappings. Built from HubSpot's docs and checked live only partly: on test portal 247756533 the Projects object, its properties, the Deal→Project associations read and the write probe all answered as expected, but no Project record could be created there (the object needs a pipeline stage, the portal has no Project pipelines and the service key can't create one), so the read, edit and post paths on a real record are covered by tests only. Tests: `hubspot/projects.test.ts` (15), `routes/crm.projects.test.ts` (8), Project checks in `hubspot/mappingValidation.test.ts`.
@@ -2328,7 +2327,7 @@
 - **HubSpot attendees, Attach Rate and Sales Team Alignment (v1.400.0, HubSpot phase 7b)** — see §9's new bullet. Attendee-based Deal/Company suggestions on calendar cards and the activity form, the Attendees section's contact search, Attach Rate's nightly coverage cache, Sales Team Alignment and the Sales Team Breakdown dashboard now work on HubSpot. HubSpot owners appear in the alignment picker; Salesforce rows already in `sf_users` are kept but hidden. Built from HubSpot docs; the id-paged Deal search was checked live on test portal 247756533. Tests: `hubspot/attendees.test.ts` (8), `routes/crmAttendees.routes.test.ts` (9), `hubspot/attachCoverage.test.ts` (5), `hubspot/recordOwners.test.ts` (3), `routes/salesTeamAlignment.routes.test.ts` (4) and an `sf_users` copy case in `hubspot/owners.test.ts`.
 - **HubSpot historical import (v1.401.0, HubSpot phase 8a)** — see §9's new bullet. The pre-ImpactIQ history import now brings in HubSpot meetings linked to a Deal, Company or Project, with the same exclusions, Relink, all-day cap and read-only screens as on Salesforce, and the nightly refresh keeps open historical Deals current. Shared table writes moved to `historical/store.ts`. The meeting search and association reads were checked live on test portal 247756533. Tests: `hubspot/historical.test.ts` (10).
 - **HubSpot MCP tools (v1.402.0, HubSpot phase 8b)** — see §9's new bullet. The MCP CRM tools run on whichever CRM the install uses: `crm.search_opportunities`, `crm.search_accounts`, `crm.get_record`, with `salesforce.search_opportunities` kept as an alias. The alias's results gain a `crm` field, `sf_not_connected` became `crm_not_connected`, and `crm_provider_mismatch` is gone since it now runs on HubSpot too; `docs/mcp.md` says so for anyone with an existing agent setup. Tests: `crm/mcpTools.test.ts` (8), which also caught `crm.get_record` opening a CRM session before checking the id (fixed).
-- **CRM name follows the Integrations choice (v1.403.0)** — see §9's "CRM name in every string" and §15. Eric asked
+- **CRM name follows the Integrations choice (v1.403.0)** — see §9's "CRM name in every string" and §15. The owner asked
   that every "Salesforce"/"SF" in the app follow Admin → Integrations → CRM so a future CRM adapts with no string edits.
   205 strings across all 7 locales now use `{{crm}}`/`{{crmShort}}`, 66 `_hubspot` variants that only swapped the name
   were removed, SF Field Mappings is renamed CRM Field Mappings, and the suggested-meeting match chips (untranslated
@@ -2336,40 +2335,40 @@
   HubSpot. Also fixed: `leader.plan_vs_actual.hint` was a truncated translation in 6 locales and pointed at a page name
   that no longer exists. First of four CRM-generic PRs (next: Field Mappings CRM toggle, Activity Types extras, Team/User
   Management + Sales Team Alignment + Historical Import).
-- **CRM Field Mappings: Salesforce / HubSpot toggle (v1.404.0)** — see §9's "CRM Field Mappings toggle". Eric chose
+- **CRM Field Mappings: Salesforce / HubSpot toggle (v1.404.0)** — see §9's "CRM Field Mappings toggle". The owner chose
   option B: one page renamed CRM Field Mappings with a toggle defaulting to the active CRM, so mappings for the other CRM
   can be prepared before switching. Validate & dry run follows the toggle. Second of four CRM-generic PRs.
-- **Activity Types extras follow the CRM (v1.405.0)** — see §9's "Activity Types extras follow the CRM". Eric: "make the
+- **Activity Types extras follow the CRM (v1.405.0)** — see §9's "Activity Types extras follow the CRM". The owner: "make the
   Salesforce Extras generic to CRM... do not lose any functionality for Salesforce." The Opp field kind now works on
   HubSpot Deal properties (read, and edit when set to read & write), each extra shows only on its own CRM, and the admin
   editor says which CRM an extra belongs to. Salesforce extras are unchanged. Also closes a gap where the per-type extras
   routes didn't check the type's team. Third of four CRM-generic PRs.
 - **Team Management, User Management, Sales Team Alignment and Historical Import follow the CRM (v1.406.0)** — see §9's
-  "Team Management, User Management and the CRM user link follow the CRM". Eric: "In team Management we can map the people
+  "Team Management, User Management and the CRM user link follow the CRM". The owner: "In team Management we can map the people
   and departments... Need to do the same in the User Management user linkage to the SF user." On HubSpot the people
   pickers list HubSpot owners, departments are HubSpot teams, a manual owner link in User Management overrides the email
   match everywhere, and the remaining wording on these pages follows the CRM. Sales Team Alignment already followed the
   CRM (v1.400.0). Last of four CRM-generic PRs.
-- **Any CRM selectable on Admin → Integrations → CRM (v1.407.0)** — see §9's "Choosing the CRM + the lock". Eric:
+- **Any CRM selectable on Admin → Integrations → CRM (v1.407.0)** — see §9's "Choosing the CRM + the lock". The owner:
   "It should still allow you to switch to a CRM provided no matter the config but notify you that it is not configured."
   Choosing HubSpot without a saved connection used to be refused (409 `errors.hubspot.not_configured`) while Salesforce
   wasn't checked at all; now neither is, and the card warns instead. The Salesforce card also used to vanish whenever
   Salesforce wasn't the CRM (so None showed only HubSpot); both cards now always show, each with a note when it isn't the
   chosen CRM. Removed `admin.integrations.hubspot.not_active_crm`.
-- **My Connections and the Account roll-up help follow the CRM (v1.408.0)** — Eric: My Settings → My Connections still
+- **My Connections and the Account roll-up help follow the CRM (v1.408.0)** — the owner: My Settings → My Connections still
   showed a Salesforce card on HubSpot. HubSpot has no per-user sign-in, so on HubSpot the card (`HubspotMeCard` in
   `Settings.tsx`) shows the HubSpot owner the user is matched to (manual link, else email) and the portal, with an amber
   note when no active owner matches; with no CRM only Outlook shows. The sidebar's CRM status reads "HubSpot Connected" /
   "HubSpot: not matched" from the same data (`hooks/useCrmMe.ts`, one fetch per page load). New `GET /api/crm/me` (`routes/crm.ts`, any
   signed-in user; HubSpot: `{configured, portalName, owner}`, other CRMs: just `{provider}`), tested in
-  `routes/crm.me.routes.test.ts`. Eric also asked whether the help popover next to the activity form's
+  `routes/crm.me.routes.test.ts`. The owner also asked whether the help popover next to the activity form's
   HubSpot Link (`SfRelationshipHelp.tsx`) needed updating: on HubSpot it still described Salesforce fields
   (`Opportunity.AccountId`, `Opportunity.CampaignId`, `Lead.ConvertedAccountId`). The 9 `sf_relationship.*` keys gain
   `_hubspot` variants in all 7 locales, matching what the account drill actually does on HubSpot (`GET
   /api/activities/account-drill`): Deals roll up to their primary Company (the snapshot's `sf_account_id`), Leads to their
   primary Company via `sf_lead_account_link` (nightly), and Campaigns don't roll up (no Deal → Campaign link). The
   popover and SfSearch's Campaign/Lead hints pass `context: useCrmLabelContext()`.
-- **CriteriaIQ projects matched by CRM id (v1.409.0)** — see §9's new bullet. Eric asked whether the CriteriaIQ field
+- **CriteriaIQ projects matched by CRM id (v1.409.0)** — see §9's new bullet. The owner asked whether the CriteriaIQ field
   names should be read from its repo or discovered at first connection. CriteriaIQ had already shipped them
   (`crmOpportunityId`/`crmAccountId` plus `GET /api/projects` filters), so ImpactIQ codes against that API contract and
   checks each returned row, falling back to name matching on an older CriteriaIQ. Project suggestions now come by
@@ -2377,12 +2376,12 @@
   compare, filter, name fallback, old-version detection), `routes/criteriaiq.projects.routes.test.ts` (4), a Won w/o
   POC id case in `primaryProjects.test.ts`.
 - **HubSpot meetings found and linked instead of logged twice (v1.410.0)** — see §9's "Meetings HubSpot already logged".
-  Eric chose "find and link, plus admin switch" for reps whose calendars sync to HubSpot: write-back adopts the meeting
+  The owner chose "find and link, plus admin switch" for reps whose calendars sync to HubSpot: write-back adopts the meeting
   HubSpot's calendar sync logged (same owner, start and end time), fills in only ImpactIQ's fields and never deletes it;
   CRM features gains **Create HubSpot meetings** (HubSpot only, default on) so an install can stop ImpactIQ creating
   meetings at all. New column `activities.crm_record_adopted` (migration 0158), named `crm_` ahead of the planned
   `sf_*` → `crm_*` rename. 12 new tests in `hubspot/writeback.test.ts`.
-- **Activity CRM columns renamed sf_* → crm_* (v1.411.0)** — first of three rename PRs Eric picked ("Database + code, 3 PRs
+- **Activity CRM columns renamed sf_* → crm_* (v1.411.0)** — first of three rename PRs the owner picked ("Database + code, 3 PRs
   by area": activity columns, then the `sf_*` tables, then everything else; Salesforce-only names stay). The 35 CRM
   columns on `activities` (What/Who/Related links, Account, Opportunity and Evaluation snapshots, deleted flags, sync
   state) and `activity_sync_audit.sf_record_id` become `crm_*`, with their TypeScript keys (`sfWhatId` → `crmWhatId`).
@@ -2397,7 +2396,7 @@
   Kept: the Salesforce-only `sf_event_type_config` (HubSpot reads the type value from `team_activity_types`),
   `sf_user_names` and `sf_object_owner_cache`, and the audit action `sf_users.sync` so older audit rows still match
   the Audit Log filter. Columns inside the renamed tables and the enum types are left for PR 3.
-- **Fresh-install migrations fixed, CI added, CLAUDE.md slimmed (v1.412.1)** — from an improvement review Eric asked for.
+- **Fresh-install migrations fixed, CI added, CLAUDE.md slimmed (v1.412.1)** — from an improvement review the owner asked for.
   (1) Reproduced on a real Postgres 16: drizzle's `migrate()` applies all pending migrations in one transaction, and
   migration 0006's `ALTER TYPE role ADD VALUE 'team_admin'` can't be used by later files before it commits (55P04), so
   every empty database failed, including the Setup wizard's own migrate step. Existing installs were unaffected because
@@ -2440,7 +2439,7 @@
   the depleted-codes 423) and `services/salesforce/writeback.flow.test.ts` (Event vs Task, update on re-sync, failure
   backoff and the retry cap, no connection, worker pick-up rule). Writing the login tests found that
   `users_auth_method_check` (migration 0012) never got `'azure'` when v1.323 added the Azure-only method, so saving a
-  user as Azure-only failed in Postgres; migration 0162 recreates the constraint with all four values. Recorded Eric's
+  user as Azure-only failed in Postgres; migration 0162 recreates the constraint with all four values. Recorded the owner's
   decision that the HubSpot historical import stays meetings only (`docs/crm-providers.md`), and added
   `docs/hubspot-production-smoke.md` for the first production portal.
 - **Split the largest files, pure moves (v1.416.0)** — P1 from the Oct 2026 review. `routes/admin.ts` keeps its gate,
@@ -2454,7 +2453,7 @@
   client sent (CSV import already checked). A new row now needs the team in `getAccessibleTeamIds()` (membership, or
   every active team for App Admins and can-see-all-teams users), else 403 `errors.forbidden`. The Outlook dedup path
   keeps the existing row's team and PATCH never changes `teamId`, so neither needs the check, and existing rows are
-  untouched. Eric chose "count first": the count query for rows the rule would have refused is in the PR body.
+  untouched. The owner chose "count first": the count query for rows the rule would have refused is in the PR body.
 - **Lazy-loaded changelog (v1.418.0)** — `nav.tsx`'s version popover now `import()`s `src/shared/changelog.ts` the
   first time it opens (one shared promise, reset on failure so the next open retries) instead of importing it
   statically, so the 250KB file is its own chunk rather than part of every page load. Shows a spinner while loading
@@ -2466,7 +2465,7 @@
   calendar's collapse button returns to the list), with the week bar, day headers and calendar header wrapping. The
   calendar and the heatmap/charts under it moved into `calendarPanel` / `calendarExtras` constants used by both layouts.
   Every desktop class is restored at `md:`, so the desktop layout is unchanged (checked side by side at 1440px).
-- **VectorIQ parity (v1.420.0)** — From the parity audit, as Eric chose. Visual changes:
+- **VectorIQ parity (v1.420.0)** — From the parity audit, as the owner chose. Visual changes:
   - **Sidebar:** links sit under Work / Insights / Learn / Admin headings, with a short rule in place of each heading
     when collapsed. The active row is a full highlight with a chevron when expanded and a round badge behind the icon
     when collapsed.
@@ -2478,7 +2477,7 @@
   - **Admin nav:** normal-case category buttons, indented items, and the active item in the theme's primary color.
     The header shows "Admin › Category".
   - **Version popover:** shows 3 releases.
-  - **Unchanged widths:** the sidebar stays `w-56` and the Admin column `w-60`, by Eric's call.
+  - **Unchanged widths:** the sidebar stays `w-56` and the Admin column `w-60`, by the owner's call.
 
   New features:
   - **Global search:** Ctrl/Cmd+K over pages, Admin sections, help topics, and the caller's own activities through
@@ -2492,7 +2491,7 @@
 
   To support search, the sidebar's page list moved to `lib/appPages.ts`, the Admin section model to
   `lib/adminSections.ts`, and the manual's sections to `lib/howToUse.ts`.
-- **Search follow-ups (v1.421.0)** — From Eric's report that "Eval" found nothing.
+- **Search follow-ups (v1.421.0)** — From the owner's report that "Eval" found nothing.
   - **Dashboards:** search lists dashboards by name, filtered like the Dashboard picker (the page's `dashboard` key, each
     dashboard's `dashboard.<tab>` key, and the Projects switch). The dashboard list moved to `lib/dashboardTabs.ts` so the
     picker and search share it. The open dashboard is now in the URL (`/dashboard?tab=<key>`), synced both ways.
@@ -2502,7 +2501,7 @@
   - **How to Use:** search matches each section's text, not just its title, and shows the matching words. A section
     about a page the user can't open (Activities, Dashboard, Scheduling, My Notes, Admin, Settings) is left out
     (`HOW_TO_USE_SECTION_PAGE_KEY`).
-- **Security audit fixes, part 1 (v1.422.0)** — From the October 2026 security audit, in the order Eric approved.
+- **Security audit fixes, part 1 (v1.422.0)** — From the October 2026 security audit, in the order the owner approved.
   - **One team per request (H1):** `requestTeamId()` (`middleware/rbac.ts`) reads the team from params, body and
     query and answers 400 `errors.teams.conflicting_team_ids` when they disagree, so a role check can't pass on one
     team while the route reads another. GET and HEAD bodies are no longer parsed. `resolveTeamScope()` returns null
@@ -2561,7 +2560,7 @@
     token printed to the server log at startup (or `SETUP_TOKEN`, 16+ characters). The wizard asks for it first (step 0)
     and keeps it in memory only.
   - Tests: `userDisable.routes.test.ts` (3), `setupToken.routes.test.ts` (3), `recordScoping.routes.test.ts` (2).
-- **Header dropdowns cut off (v1.425.1)** — From Eric's report that the language and Notifications menus opened behind
+- **Header dropdowns cut off (v1.425.1)** — From the owner's report that the language and Notifications menus opened behind
   the page. v1.420.0 gave the top bar `overflow-hidden` with its fixed 64px height, which clipped every dropdown that
   hangs below it. The bar now uses `overflow-x-clip`, which still stops a crowded phone header spilling sideways but
   lets menus extend down. The language menu also moved from `z-30` to `z-50`, matching the bell. Search (a portal
@@ -2577,7 +2576,7 @@
     answers over 1 MB are refused.
   - **Setup wizard:** no webhook (`AI_SETUP_PROVIDER_KINDS`), since setup routes answer before sign-in.
   - **Tests:** `webhook.test.ts` (10).
-- **Notifications Clear all and grouping (v1.427.0)** — From Eric's request. The bell gets a Clear all button with an
+- **Notifications Clear all and grouping (v1.427.0)** — From the owner's request. The bell gets a Clear all button with an
   inline confirmation, backed by `POST /api/notifications/clear-all` (`clearNotificationsForUser()`), which deletes every
   row in the same team scope as the list and read-all. Today's nudges are muted until the next UTC midnight (the Mark
   read mute), never closed out forever like the row X, and announcements are dismissed as their own X does, so neither
@@ -2592,7 +2591,7 @@
   (`access_denied`) or `sso_failed` and is logged server-side, and Login.tsx shows the message above the sign-in
   buttons, then removes the params from the address bar. The page only shows keys on that list, so a crafted link can't
   put its own text on the sign-in screen. A test checks every reason the callbacks use is on the list and translated.
-- **Outbound event webhooks (v1.428.0)** — Eric asked for this alongside the AI Webhook provider. Admin → Integrations →
+- **Outbound event webhooks (v1.428.0)** — the owner asked for this alongside the AI Webhook provider. Admin → Integrations →
   Event Webhooks (App Admin only, `routes/admin/eventWebhooks.ts`) sends a signed JSON POST to an admin-chosen URL for
   five events (`src/shared/eventWebhooks.ts`): `activity.submitted`, `activity.crm_sync_failed`,
   `activity.outlook_deleted`, `nudge.sent`, `job.failed`. Contract and an n8n → Teams recipe: `docs/event-webhooks.md`.
@@ -2612,7 +2611,7 @@
   - **Host checks:** `assertServiceUrl()` on save and before every send; no redirects; 15s timeout.
   - **Tests:** `eventWebhooks.test.ts` (14): subscription and retry rules, queueing, private title, signed delivery,
     retry then failed, redirects, address rules, turn-off and cull, App Admin gate, secret shown once, test send.
-- **The CRM lock shows on the other CRM's connection card (v1.429.0)** — Eric asked whether the switch-over limit
+- **The CRM lock shows on the other CRM's connection card (v1.429.0)** — the owner asked whether the switch-over limit
   shows in the Admin console. The CRM card already disabled the other CRM's button (reason only in a hover tooltip)
   and the server refused the change, but the other CRM's connection card still offered a full setup form that could
   never be used. `CrmProviderCard` now shares the lock through a context (`useCrmLockedOut()`); while locked, the other
@@ -2620,12 +2619,12 @@
   instead of the Configure toggle, and the CRM card adds a visible line saying the other CRM can't be chosen or set
   up. None stays available in both directions. Nothing changes before the lock: a saved connection alone doesn't lock,
   only the first CRM-linked record does. Known limit and roadmap entry: `docs/crm.md` §3.5, CLAUDE.md §18.
-- **Event Webhooks page 500 (v1.429.1)** — Eric reported Admin → Integrations → Event Webhooks showing HTTP 500 right
+- **Event Webhooks page 500 (v1.429.1)** — the owner reported Admin → Integrations → Event Webhooks showing HTTP 500 right
   after v1.428.0 shipped. `GET /api/admin/event-webhooks` passed a JS `Date` into a raw `sql` template (the 7-day
   delivered/failed counts); the production `postgres` driver can't bind a `Date` there, while the tests' pglite accepts
   it, so CI stayed green. Now an ISO string cast with `::timestamptz`. Every other Event Webhooks route and the delivery
   worker were run against a real Postgres 16 and worked. Added to CLAUDE.md §18 Known traps.
-- **Demo Data is safe to run on a live install (v1.430.0)** — Eric asked whether Demo Data covers every feature; the
+- **Demo Data is safe to run on a live install (v1.430.0)** — the owner asked whether Demo Data covers every feature; the
   review (Claude Doc "Demo Data coverage review") found four problems to fix before coverage work. (1) Generate now
   creates its own `[Demo] Sales Engineering` team (`DEMO_TEAM_SLUG`, `applyDefaultTeamConfig()`, generating admin
   joins as team admin) instead of writing into a team the admin picked, so demo users and activities never show in a
@@ -2660,7 +2659,7 @@
   `demoCoverageCond()` keeps demo coverage rows out of every real team's Attach Rate and attach-rate history.
   `deleteTeamCascade()` also clears `attach_rate_fields`, `attach_rate_history`, `opp_review_dismissals` and
   `subteam_users`, whose FKs don't cascade (a team with Attach Rate fields could not be deleted before).
-- **Slack DMs for nudges and announcements (v1.433.0)** — Eric asked how to send alerts to Slack for a specific user or
+- **Slack DMs for nudges and announcements (v1.433.0)** — the owner asked how to send alerts to Slack for a specific user or
   team. Before this, Slack only posted nudges to the team's Incoming Webhook channel; the bot token and
   `users.slack_user_id` (Integrations → Slack → Sync users) existed, but `sendSlackDm()` had no caller.
   - **Nudge DMs:** `nudge_rules.send_slack_dm` (Nudge Rules → "Also send as a Slack DM", default off) DMs the person
@@ -2695,7 +2694,7 @@
   forecast names and coverage use HubSpot's default pipeline vocabulary, and the Eval Work picker and Project links use
   HubSpot Projects (`0-970`). CriteriaIQ is not faked: its Project cards read the live CriteriaIQ API. Remove also clears
   demo Lead links and any activity with a `demo-` What or Who id.
-- **Slack DMs from Communications rules (v1.436.0)** — Eric asked whether Admin → Communications could send to Slack,
+- **Slack DMs from Communications rules (v1.436.0)** — the owner asked whether Admin → Communications could send to Slack,
   with admin alerts going to admins only. `email_rules.send_slack` (migration 0168) adds an "Also send as Slack DM"
   switch, shown for the rules in `SLACK_DM_EMAIL_RULES` (`src/shared/emailRuleSlack.ts`): `daily_digest`,
   `weekly_recap`, `login_new_location` (to the user) and `job_failure_alert`, `ai_budget_reached` (to App Admins, the
@@ -2882,7 +2881,7 @@
   to +10; shown at 40+, top 5) and search only list calls the owner or the caller was on; linking is owner or App Admin;
   a transcript is served only past `canReadTranscript()` (owner, on the call, App Admin, or the team's leader switch).
   Gong card gains Index calls now, the per-team switch and manual Gong user links (placed on the Gong card rather than
-  Team / User Management to keep Gong settings in one place). lucide-react upgraded 1.47 → 1.66 (approved by Eric) for the tab's
+  Team / User Management to keep Gong settings in one place). lucide-react upgraded 1.47 → 1.66 (approved by the owner) for the tab's
   `MessageCircleText` icon. Still unverified without a Gong tenant: response shapes, the calendar event id format and the
   `t=` seconds parameter on call URLs.
 - **v1.455.1 — glob and minimatch advisories.** Dependabot #43 (glob AbortSignal cancellation bypass, GHSA-3g3m-2fjr-6pw4)
@@ -2981,7 +2980,7 @@
   Subtype or null, max 3 per row). Sharing or unsharing needs admin rights on each team; unsharing deletes that team's
   assignments; only App Admins lock. Rubric edits bump `version` so later scores can record which rubric they used.
   `computeAssessmentScores()` / `resolveAssessmentIds()` (`src/shared/aiAssessments.ts`) are the scoring and
-  "Subtype rows win, else type-wide rows" rules for part 2. Eric's decisions: two scores (not-observed zeroed, and
+  "Subtype rows win, else type-wide rows" rules for part 2. The owner's decisions: two scores (not-observed zeroed, and
   observed-only with the not-observed count), scores for Leaders only with a dashboard, personal sections stay,
   assessments run only when a transcript was read. Workplace → AI Notes became the Settings tab (`?section=ai_notes`
   redirects; Role Management key `admin.ai_notes` kept). Also: AI Notes tab sections are color-coded
@@ -3014,7 +3013,7 @@
   OpenAI, Gemini, xAI; fixed hosts), else the current models in the LiteLLM price list
   (`services/ai/modelCatalog.ts`, downloaded from GitHub, cached 12 h, 10 min back-off after a failure), else the
   built-in suggestions. Each model is priced from LiteLLM (Bedrock prefers the Mantle price) or the built-in table. The
-  form fills blank or previously auto-filled price fields; a typed price turns that off and is what gets saved. Eric
+  form fills blank or previously auto-filled price fields; a typed price turns that off and is what gets saved. The owner
   chose LiteLLM as the price source. Activity Types export gains an optional `aiAssessments` section
   (`services/aiAssessments/transfer.ts`): match by name among assessments shared with the team, shared or locked ones
   skipped (locked editable by App Admins), rubric changes bump the version, assignments only added (cap 3 per slot).
@@ -3022,9 +3021,9 @@
   Remove deletes the demo team's rubrics first.
   Also on the AI Assistant page: provider marks (`AiProviderLogo.tsx`, Simple Icons paths, CC0; Azure OpenAI shows the
   OpenAI mark and Foundry the Anthropic mark, as Simple Icons has no Microsoft mark), header icons on Providers and
-  Usage, and the routing card shows with one active provider as a hint instead of being hidden (Eric couldn't find
+  Usage, and the routing card shows with one active provider as a hint instead of being hidden (the owner couldn't find
   per-feature routing). `isAiProviderKind()` moved to `src/shared/ai.ts`.
-- **v1.465.0** — AI Assessments page cleanup (Eric's review of the three tabs). Assessments are collapsed cards
+- **v1.465.0** — AI Assessments page cleanup (the owner's review of the three tabs). Assessments are collapsed cards
   (chevron, icon, name, badges, quick Edit) and expand to the criteria list; `ai_assessments.icon` / `icon_color`
   (migration 0181, cosmetic so no version bump) come from the shared IconPicker / ColorPicker and travel in the
   Activity Types export (optional keys; a file without them leaves the icon alone). In the editor each criterion is a
@@ -3036,14 +3035,14 @@
 - **v1.466.0** — AI Note Settings Profiles (AI Assessments → Settings, migration 0182). `ai_note_profiles` (team-owned:
   name, description, icon, color, built-in `sections`, `custom_sections` jsonb of `{key: "c_…", name, instructions, icon,
   color}`), `ai_assessments.ai_note_profile_id` (set null on delete), `activity_ai_note_items.section_meta` (a custom
-  section's name/icon/color when written, so items survive the profile changing). Eric chose "profile adds to personal
+  section's name/icon/color when written, so items survive the profile changing). The owner chose "profile adds to personal
   sections": `sectionPlanForActivity()` (`services/aiNotes/profiles.ts`) merges the owner's sections with the profiles of
   every assessment that runs on the activity (same assignment rules as scoring), built-ins in canonical order then custom
   sections. Prompt lists each custom key with its instructions, the JSON schema enum is built per call, the parser keeps
   custom items as text + citations only. Routes `/api/admin/teams/:teamId/ai-note-profiles` (Team Admin, audited
   `ai_note_profile.*`, delete destructive); an assessment can only pick a profile from the team that owns it. Not in this
   release: personal/team default sections stay built-ins only, and profiles are not in the Activity Types export.
-- **v1.467.0** — AI Assistant Usage this month reorganized (Eric's ask). `GET /api/admin/ai/usage?groupBy=feature|team|user
+- **v1.467.0** — AI Assistant Usage this month reorganized (the owner's ask). `GET /api/admin/ai/usage?groupBy=feature|team|user
   &feature&teamId&userId&page` (App Admin, `services/ai/usage.ts`): this month's `ai_requests` grouped (requests, failed,
   tokens, cost, sorted by cost) plus one 20-row page of requests with team and person, and the filter choices seen this
   month. A request's team is `coalesce(ai_requests.team_id, requester.default_team_id)`; `none` filters requests with no
@@ -3061,7 +3060,7 @@
   `src/shared/ai.ts`) is set from the AI features card on AI Assistant (always shown, formerly Feature routing; the
   provider picker still appears only with 2+ active providers). `aiAvailability()` and `runAi()` answer a turned-off
   feature as `disabled`, so every caller already falls back to its no-AI path, and nothing is logged to `ai_requests`;
-  `aiNotesSwitchedOn()` checks it too. Asked by Eric, who wanted Activity type suggestions on keyword rules only. Also
+  `aiNotesSwitchedOn()` checks it too. Asked by the owner, who wanted Activity type suggestions on keyword rules only. Also
   fixed: the weekly calendar's AI classification (`routes/outlook.ts`) never passed `requestedBy`, so its requests
   showed as No team / no person in Usage; it now charges the calendar's owner (team via their default team; `team_id`
   stays unset so AI Notes' per-team limit doesn't count classification).
@@ -3082,7 +3081,7 @@
   `outsideTeams`; the picker shows them in an amber group to remove. Leaving a team (team member delete, or Edit user's
   supported/default team change) drops that team's member-role subteam rows; subteam leader rows are untouched.
   Existing stale rows are not deleted in bulk: they show in the amber group for an admin to decide.
-- **v1.471.0** — Default Settings Profile. Eric asked for the team's AI Note default sections to be a profile so it can
+- **v1.471.0** — Default Settings Profile. The owner asked for the team's AI Note default sections to be a profile so it can
   be replaced or turned off more easily, and chose a per-profile Add or Replace switch. Migration 0184 adds
   `ai_note_profiles.is_default` (partial unique index, one per team) and `combine_mode` (`add`|`replace`, default `add`),
   and gives every existing team a "Default" profile holding its saved default sections (all built-ins when it had none).
@@ -3094,7 +3093,7 @@
   `teams.ai_notes_default_sections` stays in the schema unread. New teams start with no Default profile (every
   built-in), and the Settings Profiles card says so.
   Same release: the AI features card on AI Assistant shows, for every feature, what it does and where (`feature_about`)
-  and what happens when it's off (`feature_off_effect`), after Eric asked what turning each one off does. New
+  and what happens when it's off (`feature_off_effect`), after the owner asked what turning each one off does. New
   `GET /api/ai/features` (`routes/ai.ts`) returns `aiAvailability()` per feature without calling a provider; My Notes
   uses it to hide AI Organize and Ask My Notes when they're off (they used to stay and fail on click). The AI Organize
   tooltip no longer names GPT-4o.
@@ -3104,7 +3103,7 @@
   territory 001) is applied where the Outlook timezone is written (hourly refresh, connect callback) and in the client's
   `resolveTZ()` (unknown values fall back to the browser zone). Stored values are rewritten once per boot by
   `normalizeStoredTimezones()` (in code, not a migration, so the mapping has one copy).
-- **v1.472.0** — User and Team edit forms regrouped. Eric found the User Management edit/new-user form and the Team
+- **v1.472.0** — User and Team edit forms regrouped. The owner found the User Management edit/new-user form and the Team
   Management edit form one long, unmarked list, so three layouts were pitched (in-place collapsible sections, a side
   drawer with tabs, a section rail with cards) and he picked the first. New `components/admin/FormSection.tsx`:
   `FormSection` (colored icon chip, title, one-line summary shown while closed, required status pill),
@@ -3118,17 +3117,17 @@
   to `/admin?section=cost_groups`, and the team form's Work Week Defaults heading no longer shows twice
   (`WorkWeekDefaults bare`). Same save payloads, no API or schema change.
 - **v1.472.1** — The v1.472.0 User and Team edit forms capped at `max-w-5xl`, which left a wide empty band on large
-  screens; Eric asked for them to fill the width. The cap is removed from the edit user, new user and edit team forms;
+  screens; the owner asked for them to fill the width. The cap is removed from the edit user, new user and edit team forms;
   section layouts are unchanged.
 - **v1.473.0** — Demo Data seeds AI Note Settings Profiles (`services/demo/profileFixtures.ts`): a starred Default
   profile with every built-in section, plus Discovery Deep Dive and Demo Follow-up (Add) and Evaluation Checkpoint
   (Replace: summary, checked, next steps, risks and a Success criteria status section), each set as its sample AI
   Assessment's profile. The demo AI Notes carry items in those custom sections (with `section_meta`), and the
   evaluation note no longer has a MEDDPICC section since its profile replaces the default. Profiles go with the demo
-  team (cascade). Same release: Eric asked to remove the activity card's "Gong call" badge, which repeated the
+  team (cascade). Same release: the owner asked to remove the activity card's "Gong call" badge, which repeated the
   Transcripts icon; the badge, the card's `gongLinked` prop and the `activity.gong.linked` / `linked_hint` strings are
   gone (`/api/gong/week` still returns `linked`, now unused by the weekly view).
-  Also in v1.473.0: Eric saw four "Activity type suggestions" requests for one person's calendar and asked for one
+  Also in v1.473.0: the owner saw four "Activity type suggestions" requests for one person's calendar and asked for one
   request covering all their unmatched meetings, with a count. `classifyManyWithAI()` (`services/ai/classify.ts`)
   answers cached meetings from `ai_classification_cache` (same per-meeting hash as before), sends the rest in one
   request (40 per request at most, `CLASSIFY_BATCH_SIZE`) and caches each answer; a meeting the answer leaves out is not
