@@ -247,7 +247,7 @@ describe('prependHubspotProjectField', () => {
     })
     expect(res).toMatchObject({ ok: true, maximumCharacters: projects.HUBSPOT_STRING_MAX, target: { property: 'eng_notes', label: 'Engineer Notes' } })
     const entry = (res as { formattedEntry: string }).formattedEntry
-    expect(entry).toMatch(/^\d{2}\/\d{2}\/\d{2} - EG: Demo went well$/)
+    expect(entry).toMatch(/^\d{2}\/\d{2}\/\d{2} - JD: Demo went well$/)
     const patch = request.mock.calls.find(([, o]) => o?.method === 'PATCH')!
     expect((patch[1]!.body as { properties: Record<string, string> }).properties['eng_notes']).toBe(`${entry}\n\nolder note`)
   })
