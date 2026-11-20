@@ -15,6 +15,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.479.1',
+    date: '2026-11-20',
+    highlights: [
+      { category: 'fix', text: 'The Docker image starts again. Since the November 16 dependency update it stopped at boot because a package the AI Assistant needs was left out of the image.' },
+      { category: 'fix', text: 'A fresh Docker Compose install starts its bundled Postgres 18: the database volume now mounts where Postgres 18 expects it.' },
+      { category: 'improvement', text: 'CI now builds the image and runs a fresh Docker Compose install on every pull request, so an install that cannot start is caught before merge.' },
+    ],
+  },
+  {
     version: '1.479.0',
     date: '2026-11-17',
     highlights: [

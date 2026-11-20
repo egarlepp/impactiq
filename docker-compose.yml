@@ -16,8 +16,10 @@ services:
       # No default: a published default password is a published password.
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (openssl rand -hex 24)}
       POSTGRES_DB: ${POSTGRES_DB:-impactiq}
+    # Postgres 18 images keep data in a versioned folder under /var/lib/postgresql
+    # and refuse to start with a volume mounted at the old .../data path.
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     # Reachable from this machine only (for `npm run dev` on the host). Docker
     # writes its own firewall rules, so a plain '5432:5432' would publish the
     # database to the whole network even behind a host firewall.

@@ -72,3 +72,34 @@ jobs:
         run: npm run db:migrate
       - name: Seed
         run: npm run db:seed
+
+  compose:
+    name: Fresh install (docker compose)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The README's own quick start: copy .env.example, set the three
+      # secrets, docker compose up. Catches an image that builds but can't
+      # boot, and a bundled Postgres that won't start.
+      - name: Configure .env
+        run: |
+          cp .env.example .env
+          for k in POSTGRES_PASSWORD SESSION_SECRET TOKEN_ENCRYPTION_KEY; do
+            v=$(openssl rand -hex 32)
+            if grep -q "^$k=" .env; then sed -i "s|^$k=.*|$k=$v|" .env; else echo "$k=$v" >> .env; fi
+          done
+      - name: Start
+        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Ready and waiting for the first admin
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/ready >/dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:3000/ready
+          curl -fsS http://127.0.0.1:3000/api/first-run/status | grep -q '"needsAdmin":true'
+          docker compose logs app | grep -q 'Setup token'
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs

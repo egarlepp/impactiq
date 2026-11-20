@@ -2011,6 +2011,6 @@ a user would look under; a security fix is `security`, not `fix`. The App Update
 
 ---
 
-*Last updated: November 2026 — v1.479.0 (effort API lists a project's activities for CriteriaIQ's Activities drawer: POST /api/v1/effort/project-activities. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
+*Last updated: November 2026 — v1.479.1 (fresh installs work again: the Docker image ships the server's nested dependencies, Compose mounts Postgres 18's volume at /var/lib/postgresql, and CI runs a fresh docker compose install. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
 *Human: Eric — Senior Director, Solutions Engineering*
 *Repo: https://github.com/egarlepp/impactiq*
