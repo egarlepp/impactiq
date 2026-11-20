@@ -15,6 +15,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.480.0',
+    date: '2026-11-20',
+    highlights: [
+      { category: 'improvement', text: 'Reminders on the Activities page now show as one stacked card instead of a list: a count with arrows on the left moves through them, and marking one read or snoozing it brings up the next.' },
+    ],
+  },
+  {
     version: '1.479.1',
     date: '2026-11-20',
     highlights: [

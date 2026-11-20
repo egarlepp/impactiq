@@ -4560,6 +4560,9 @@
     }
   },
   "nudge": {
+    "position": "{{current}} von {{total}}",
+    "previous": "Vorherige Erinnerung",
+    "next": "Nächste Erinnerung",
     "dismiss": "Verwerfen",
     "close_out": "Abschließen",
     "close_out_tip": "Abschließen — beendet diese Erinnerung dauerhaft. Sie wird nie wieder angezeigt."

@@ -4580,6 +4580,9 @@
     }
   },
   "nudge": {
+    "position": "{{current}} of {{total}}",
+    "previous": "Previous reminder",
+    "next": "Next reminder",
     "dismiss": "Dismiss",
     "close_out": "Close out",
     "close_out_tip": "Close out — permanently stops this reminder. It will never show again."

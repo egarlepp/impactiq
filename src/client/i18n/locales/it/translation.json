@@ -4580,6 +4580,9 @@
     }
   },
   "nudge": {
+    "position": "{{current}} di {{total}}",
+    "previous": "Promemoria precedente",
+    "next": "Promemoria successivo",
     "close_out_tip": "Chiudi — interrompe definitivamente questo promemoria. Non verrà più mostrato.",
     "dismiss": "Ignora",
     "close_out": "Chiudi definitivamente"

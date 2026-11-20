@@ -3205,3 +3205,6 @@
   `docker-compose.yml` mounted Postgres at `/var/lib/postgresql/data`, which Postgres 18 images refuse, so the bundled
   database never started; it now mounts `/var/lib/postgresql`. CI gained a "Fresh install (docker compose)" job that
   builds the image, starts the stack, waits for `/ready` and checks the first-run status and setup token.
+- **v1.480.0** (2026-11-20) Activities page nudges render as one stacked card (`WeeklyView.tsx`) instead of a vertical
+  list: an "N of M" count with previous/next arrows on the left, one or two cards peeking out underneath when there are
+  more, and Mark read / Snooze removing the current nudge so the next takes its place (index clamped when the list shrinks).
