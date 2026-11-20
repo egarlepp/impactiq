@@ -234,7 +234,7 @@ describe('writeHubspotProjectFields', () => {
 })
 
 describe('prependHubspotProjectField', () => {
-  const user = { id: '', firstName: 'Eric', lastName: 'Garlepp', timezone: 'UTC' }
+  const user = { id: '', firstName: 'Jane', lastName: 'Doe', timezone: 'UTC' }
 
   it('puts a dated entry above the current text', async () => {
     await map('eval_engineer_notes', 'eng_notes', 'write')

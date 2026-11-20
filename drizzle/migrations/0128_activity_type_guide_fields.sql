@@ -30,7 +30,7 @@ INSERT INTO role_permissions (role, page_key, has_access) VALUES
   ('team_admin',  'guide', true)
 ON CONFLICT (role, page_key) DO NOTHING;
 
--- Seed the Guide content Eric provided for the default Sales Engineering
+-- Seed the Guide content the owner provided for the default Sales Engineering
 -- ("solutions-engineering") team's 9 non-Meeting activity types. Only
 -- fills currently-blank rows so a re-run (or a prior manual edit) is never
 -- clobbered; other teams start blank and simply won't show a card until

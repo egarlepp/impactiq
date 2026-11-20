@@ -3,7 +3,7 @@ import { db } from '../../db/index.js'
 import { rolePermissions, teamMembers, users } from '../../../../drizzle/schema.js'
 import { canViewActivity } from '../activities/access.js'
 
-// Who sees, and runs, AI Assessment scores on an activity (v1.462.0, Eric:
+// Who sees, and runs, AI Assessment scores on an activity (v1.462.0, the owner:
 // "scores are for Leaders only"). Never the activity's owner, even when the
 // owner is a Leader too: nobody grades their own call. Otherwise, once the
 // caller can see the activity at all:

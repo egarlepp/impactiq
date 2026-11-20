@@ -3566,7 +3566,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     version: '1.129.0',
     date: '2026-07-23',
     highlights: [
-      { category: 'security', text: 'Fix: canEdit on notes is now owner-only. Previously any App Admin caller got canEdit=true on every note, so Solutions Engineering (an App Admin) saw the full Edit / Delete / Private toolbar on Eric Garlepp\'s notes. Now buttons only enable for the note\'s original author. App Admins can still see every note (including private) but can\'t mutate through the UI' },
+      { category: 'security', text: 'Fix: canEdit on notes is now owner-only. Previously any App Admin caller got canEdit=true on every note, so an App Admin saw the full Edit / Delete / Private toolbar on another user\'s notes. Now buttons only enable for the note\'s original author. App Admins can still see every note (including private) but can\'t mutate through the UI' },
       { category: 'fix', text: 'Fix: Team-of-Teams Rollup Diagnostics expander is now emitted on every response path — previously the "no accessible teams" branch dropped the meta.diagnostics entirely, so the expander never rendered when scope was empty. Expander is now open by default and dumps the full JSON so it\'s obvious at a glance whether scope resolved, teams returned rows, and activities matched. Response also carries callerIsAppAdmin, totalTeams, activeTeams, requested and accessible team ids, and activitiesInScope counts (all-time and submitted) so we can pin down which filter is dropping the rows' },
     ],
   },

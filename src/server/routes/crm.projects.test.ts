@@ -63,7 +63,7 @@ beforeAll(async () => {
   schema = await import('../../../drizzle/schema.js')
   evalSource = await import('../services/criteriaiq/evaluationSource.js')
   db = (await import('../db/index.js')).db
-  const [u] = await db.insert(schema.users).values({ oktaId: `okta-${crypto.randomUUID()}`, email: 'eg@example.com', displayName: 'E G', firstName: 'Eric', lastName: 'Garlepp' }).returning()
+  const [u] = await db.insert(schema.users).values({ oktaId: `okta-${crypto.randomUUID()}`, email: 'eg@example.com', displayName: 'J D', firstName: 'Jane', lastName: 'Doe' }).returning()
   userId = u!.id
 })
 
@@ -166,7 +166,7 @@ describe('Engineer Notes / Next Steps posting', () => {
     const body = { teamId: TEAM, sobject: '0-970', appField: 'eval_engineer_notes', recordId: '77', text: ' hi ' }
     const res = await call('POST', '/field-prepend', body)
     expect(res.body.data).toMatchObject({ formattedEntry: '10/22/26 - EG: hi', maximumCharacters: 65536 })
-    expect(prepend.mock.calls[0]![0]).toMatchObject({ teamId: TEAM, objectTypeId: '0-970', recordId: '77', text: 'hi', user: { id: userId, firstName: 'Eric', lastName: 'Garlepp' } })
+    expect(prepend.mock.calls[0]![0]).toMatchObject({ teamId: TEAM, objectTypeId: '0-970', recordId: '77', text: 'hi', user: { id: userId, firstName: 'Jane', lastName: 'Doe' } })
 
     prepend.mockResolvedValueOnce({ ok: false, status: 409, error: 'errors.hubspot.field_changed', meta: { currentLength: 9 } })
     expect(await call('POST', '/field-prepend', body)).toMatchObject({ status: 409, body: { error: 'errors.hubspot.field_changed', meta: { currentLength: 9 } } })

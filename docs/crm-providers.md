@@ -174,7 +174,7 @@ One install talks to one CRM, never two.
   link (API key, connection, live refresh webhook, SE effort key, troubleshooting) live in How to Use ImpactIQ's
   `criteriaiq` section (`how_to_use.criteriaiq_body`), linked from the card; keep it in step with CriteriaIQ's menus.
 - **HubSpot connection, owner matching and access check** *(v1.389+, HubSpot phase 2a)* — the connection
-  the HubSpot provider (v1.390+, next bullet) runs on. Auth is a **service key or private app access token** for the whole portal (Eric's choice; both are sent the same way, and a service key from Development → Keys → Service Keys is the recommended one), not OAuth: no per-user HubSpot login,
+  the HubSpot provider (v1.390+, next bullet) runs on. Auth is a **service key or private app access token** for the whole portal (the owner's choice; both are sent the same way, and a service key from Development → Keys → Service Keys is the recommended one), not OAuth: no per-user HubSpot login,
   so an ImpactIQ user's HubSpot owner is the owner with the same email (case-insensitive). The token lives in
   `system_settings` key `hubspot_config` (encrypted with `encryptToken`, plus `portalId`/`portalName`/`accountType`/
   `uiDomain` and the last access check; `services/hubspot/config.ts`). `services/hubspot/client.ts` only ever calls
@@ -374,7 +374,7 @@ One install talks to one CRM, never two.
   `getHubspotOwnerIdForUser()`. The exclusions search reads `GET /api/admin/sf-users` (lists the active CRM's people).
   Screens read HubSpot wording via the `_hubspot` i18next context. Not live-run end to end: the slice search and
   association reads were checked on test portal 247756533.
-- **Historical import scope: meetings only** *(decided 2026-10-23, Eric)* — the HubSpot historical import brings in
+- **Historical import scope: meetings only** *(decided 2026-10-23, the owner)* — the HubSpot historical import brings in
   meetings and nothing else: no calls, emails, tasks or notes. It mirrors the Salesforce import, which reads Events only,
   and meetings are the one engagement type that maps cleanly to logged SE time (a start, an end and attendees). Calls
   and emails would inflate the history with short or zero-length touches, and tasks have no duration to estimate from.
