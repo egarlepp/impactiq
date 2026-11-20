@@ -311,6 +311,8 @@ export default function WeeklyView() {
   }, [activities])
   const [prefill, setPrefill] = useState<{ outlookEventId: string; title: string; startDatetime: string; endDatetime: string; activityTypeId?: string | null; descriptionBody?: string; meetingOwner?: string; meetingOwnerEmail?: string | null; attendees?: { name?: string; email?: string }[]; isAllDay?: boolean; eventType?: string; seriesMasterId?: string; isPrivate?: boolean } | null>(null)
   const [nudges, setNudges] = useState<NudgeNotification[]>([])
+  // Which nudge the stacked card shows (clamped at render when the list shrinks).
+  const [nudgeIndex, setNudgeIndex] = useState(0)
   // v1.287.0: snooze-duration menu for the nudge card, portaled outside the
   // card's own layout so ancestor `overflow` can't clip it — same pattern
   // as the notification bell's snooze menu.
@@ -428,6 +430,7 @@ export default function WeeklyView() {
     if (!activeTeam) return
     api.get<NudgeNotification[]>(`/api/nudges?teamId=${activeTeam.id}&locale=${encodeURIComponent(i18nHook.language || 'en')}`).then((res) => {
       setNudges(res.data ?? [])
+      setNudgeIndex(0)
     })
   }, [activeTeam?.id, i18nHook.language])
 
@@ -842,17 +845,60 @@ export default function WeeklyView() {
           </div>
         </div>
 
-        {/* Nudge banners */}
-        {nudges.length > 0 && (
-          <div className="flex flex-col gap-2 px-3 pt-3 md:px-6">
-            {nudges.map((nudge) => {
-              const iconMeta = nudgeIconFor(nudge.triggerType)
-              const Icon = iconMeta.icon
-              return (
+        {/* Nudge banners (v1.480.0): one stacked card, not a list. The count and
+            arrows on the left move through them; Mark read / Snooze removes the
+            current one and the next slides into its place. */}
+        {nudges.length > 0 && (() => {
+          const idx = Math.min(nudgeIndex, nudges.length - 1)
+          const nudge = nudges[idx]
+          if (!nudge) return null
+          const iconMeta = nudgeIconFor(nudge.triggerType)
+          const Icon = iconMeta.icon
+          const many = nudges.length > 1
+          const navBtn = 'flex h-6 w-6 items-center justify-center rounded text-amber-600 hover:bg-amber-100 hover:text-amber-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent dark:text-amber-400 dark:hover:bg-amber-900/40 dark:hover:text-amber-200'
+          return (
+          <div className={cn('px-3 pt-3 md:px-6', many && (nudges.length > 2 ? 'pb-3' : 'pb-1.5'))}>
+            <div className="relative">
+              {/* Cards peeking out underneath, so it reads as a stack. */}
+              {nudges.length > 2 && (
+                <div aria-hidden="true" className="absolute inset-x-4 -bottom-3 h-full rounded-lg border border-amber-200 bg-amber-50/60 dark:border-amber-900 dark:bg-amber-950/30" />
+              )}
+              {many && (
+                <div aria-hidden="true" className="absolute inset-x-2 -bottom-1.5 h-full rounded-lg border border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/40" />
+              )}
               <div
                 key={nudge.ruleId}
-                className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                role="status"
+                aria-live="polite"
+                className="relative flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300"
               >
+                {many && (
+                  <div className="flex shrink-0 items-center gap-0.5 border-r border-amber-200 pr-2 dark:border-amber-800">
+                    <button
+                      type="button"
+                      onClick={() => setNudgeIndex(idx - 1)}
+                      disabled={idx === 0}
+                      className={navBtn}
+                      aria-label={t('nudge.previous')}
+                      title={t('nudge.previous')}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <span className="min-w-[3.25rem] text-center text-xs font-semibold tabular-nums">
+                      {t('nudge.position', { current: idx + 1, total: nudges.length })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setNudgeIndex(idx + 1)}
+                      disabled={idx >= nudges.length - 1}
+                      className={navBtn}
+                      aria-label={t('nudge.next')}
+                      title={t('nudge.next')}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
                 <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', iconMeta.bg)}>
                   <Icon className={cn('h-4 w-4', iconMeta.fg)} aria-hidden="true" />
                 </span>
@@ -878,10 +924,10 @@ export default function WeeklyView() {
                   <BellOff className="h-4 w-4" />
                 </button>
               </div>
-              )
-            })}
+            </div>
           </div>
-        )}
+          )
+        })()}
         {nudgeSnoozeMenu && createPortal(
           <div
             ref={nudgeSnoozeMenuRef}

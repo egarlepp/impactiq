@@ -4560,6 +4560,9 @@
     }
   },
   "nudge": {
+    "position": "{{current}} / {{total}}",
+    "previous": "前のリマインダー",
+    "next": "次のリマインダー",
     "close_out_tip": "終了 — このリマインダーを完全に停止します。二度と表示されません。",
     "dismiss": "閉じる",
     "close_out": "完全に閉じる"
