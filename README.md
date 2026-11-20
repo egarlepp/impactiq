@@ -25,15 +25,23 @@ Its business case should answer five leadership questions:
 
 **Activities**: log the week's work from your calendar, with type suggestions, CRM links and capacity at a glance.
 
-![Activities page with suggested meetings, the Outlook calendar and weekly capacity](docs/screenshots/activities.png)
-
-**Team Dashboard**: capacity heatmap by person and week, one of 20+ leader dashboards.
-
-![Team Dashboard showing the capacity heatmap and the dashboard picker](docs/screenshots/team-heatmap.png)
+![Activities page with suggested meetings, the Outlook calendar and weekly capacity](docs/screenshots/01-activities.png)
 
 **App Health**: a live overview of the database, jobs, queues, integrations and backups for admins.
 
-![Admin App Health page with the System Health Overview tiles](docs/screenshots/app-health.png)
+![Admin App Health page with the System Health Overview tiles](docs/screenshots/02-app-health.png)
+
+**Guide**: when to use each activity type, what it attaches to, and worked examples, set per team.
+
+![Activity Type Guide with one card per activity type](docs/screenshots/03-activity-type-guide.png)
+
+**Team Dashboard**: capacity heatmap by person and week, one of 20+ leader dashboards.
+
+![Team Dashboard showing the capacity heatmap and the dashboard picker](docs/screenshots/04-team-heatmap.png)
+
+**My Notes**: every note grouped by Opportunity, Account and Campaign, with MEDDPICC tags and Ask My Notes.
+
+![My Notes split-pane explorer with a note open](docs/screenshots/05-my-notes.png)
 
 ## Feature Highlights
 
