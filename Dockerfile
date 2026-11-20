@@ -4,6 +4,10 @@ COPY package*.json ./
 COPY src/server/package*.json ./src/server/
 COPY src/client/package*.json ./src/client/
 RUN npm ci
+# npm doesn't always hoist a workspace's dependency to the root node_modules
+# (it keeps one nested when versions clash, e.g. @anthropic-ai/sdk). Keep the
+# folder so the COPY in the production stage always has something to copy.
+RUN mkdir -p src/server/node_modules
 COPY . .
 RUN npm run build
 
@@ -12,6 +16,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=base /app/dist ./dist
 COPY --from=base /app/node_modules ./node_modules
+# v1.479.1: the server's nested dependencies, where Node looks for them from
+# dist/server/src/server. Without this the image crashed at boot with
+# ERR_MODULE_NOT_FOUND for @anthropic-ai/sdk.
+COPY --from=base /app/src/server/node_modules ./dist/server/src/server/node_modules
 COPY --from=base /app/package.json ./package.json
 COPY --from=base /app/drizzle ./drizzle
 COPY --from=base /app/src/client/dist ./src/client/dist

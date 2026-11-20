@@ -3198,3 +3198,10 @@
   it came in only through the Opportunity fallback. Newest first, at most 500, never titles, notes or cost. The matching
   moved into one `matchProjects()` (`services/activities/projectActivityCounts.ts`) that both `project-counts` and the
   list use, so they always agree. CSRF-exempt like `project-counts` (Bearer keys only).
+- **v1.479.1** — Fresh-install fixes found while testing the public snapshot. The production image crashed at boot with
+  `ERR_MODULE_NOT_FOUND` for `@anthropic-ai/sdk`: since the November 16 dependency update npm keeps that package nested
+  in `src/server/node_modules`, which the production stage never copied. The Dockerfile now copies it to
+  `dist/server/src/server/node_modules` (and creates the folder in the build stage so the COPY never fails).
+  `docker-compose.yml` mounted Postgres at `/var/lib/postgresql/data`, which Postgres 18 images refuse, so the bundled
+  database never started; it now mounts `/var/lib/postgresql`. CI gained a "Fresh install (docker compose)" job that
+  builds the image, starts the stack, waits for `/ready` and checks the first-run status and setup token.

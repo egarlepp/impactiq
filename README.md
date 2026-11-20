@@ -506,6 +506,10 @@ Migrations run automatically at startup, in order, one transaction per file. Tak
 aren't supported: restore the dump and run the older version instead. Admin → Integrations → App Updates can tell the
 default admin when a newer release is on `main`.
 
+Since v1.479.1 `docker-compose.yml` mounts the Postgres volume at `/var/lib/postgresql`, the layout Postgres 18 images
+expect. If your volume was created by an older compose file with a different Postgres major version, don't point the new
+image at it: `pg_dump` the old database, start the new stack on a fresh volume, and restore the dump with `pg_restore`.
+
 ## i18n
 
 All user-facing strings go through `react-i18next`. Translation files live in `src/client/i18n/locales/{lang}/translation.json`. English (`en`) is the authoritative source. A missing key does **not** visibly fall back to English — `t(key, 'English default')` resolves to the inline default argument, not the `en` locale — so every PR that adds or renames a user-facing string must update all seven locale files in the same PR. `python3 scripts/check-i18n-parity.py` enforces key parity across all seven; it cannot catch a key that exists but still holds literal English text as its value, which is a separate, real defect class this project hit and closed out for every locale (v1.312–v1.326).
