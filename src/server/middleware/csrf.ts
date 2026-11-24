@@ -48,7 +48,9 @@ export function csrf(req: Request, res: Response, next: NextFunction): void {
     // Read-only POST for effort:read Bearer keys only (v1.454.0, routes/effortApi.ts);
     // it never reads a session cookie, so there is no session to forge.
     req.path === '/api/v1/effort/project-counts' ||
-    req.path === '/api/v1/effort/project-activities'
+    req.path === '/api/v1/effort/project-activities' ||
+    // activities:log Bearer keys only (v1.481.0, routes/activityLogApi.ts); no session cookie is read.
+    req.path === '/api/v1/activities/log'
   ) {
     next(); return
   }

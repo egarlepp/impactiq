@@ -165,6 +165,9 @@ export const AUDIT_ACTIONS = [
   // Event/Task records for write-back. A data CORRECTION, not destructive —
   // same classification as sf_field_mapping.update, not sf_field_mapping.delete.
   'activity.relink_opportunity',
+  // v1.481.0: another tool (DemoIQ) logged a draft activity for a user through
+  // POST /api/v1/activities/log with an App Admin's activities:log key.
+  'activity.log_via_api',
   // HubSpot plan, phase 7: the nightly link-health job (or the drawer's live
   // check) moved activities off a HubSpot record that was merged into another.
   // A correction, not destructive; logged with no actor.
