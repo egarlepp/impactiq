@@ -14,6 +14,7 @@ import { verifyApiKey } from '../services/auth/apiKeys.js'
 import { db } from '../db/index.js'
 import { users } from '../../../drizzle/schema.js'
 import { mcpRateCheck } from '../middleware/mcp-rate-limit.js'
+import { rateLimit } from '../middleware/rate-limit.js'
 import { logAudit } from '../services/audit/log.js'
 import { getPublicBaseUrl } from '../services/config/integrations.js'
 import { externalLogRequestSchema, logExternalActivity } from '../services/activities/externalLog.js'
@@ -61,7 +62,11 @@ async function activityLogKeyOwner(req: Request, res: Response): Promise<KeyOwne
   return { userId: verified.userId, email: owner.email, apiKeyId: verified.apiKeyId }
 }
 
-activityLogApiRouter.post('/activities/log', async (req, res) => {
+// Per address, before the key is even checked, so guessing keys is slow too.
+// The per-key limit (mcpRateCheck) still applies after a key is accepted.
+const perIpLimit = rateLimit({ windowMs: 60_000, max: 120 })
+
+activityLogApiRouter.post('/activities/log', perIpLimit, async (req, res) => {
   try {
     // The key is checked before the body, so a caller without one learns nothing.
     const keyOwner = await activityLogKeyOwner(req, res)

@@ -14,7 +14,8 @@ that scope, and the server refuses it for anyone else. The key:
   because it lacks `mcp:read`)
 - needs its owner to still be an active App Admin with no pending password change on every call, not only when it was
   made. Disabling or demoting the owner stops it.
-- is limited per key per minute and per hour (the same limits as MCP and effort keys)
+- is limited per key per minute and per hour (the same limits as MCP and effort keys), and each address to 120
+  calls a minute before the key is checked
 
 Every activity it creates is in the Audit Log as `activity.log_via_api`, with the key owner as the actor.
 
