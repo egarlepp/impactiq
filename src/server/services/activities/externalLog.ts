@@ -7,7 +7,7 @@
 import { z } from 'zod'
 import { and, asc, eq, or, sql } from 'drizzle-orm'
 import { db } from '../../db/index.js'
-import { activities, activityTypeTeams, teamActivityTypes, teamMembers, teams, users } from '../../../../drizzle/schema.js'
+import { activities, activityTypeTeams, teamActivityTypeSubtypes, teamActivityTypes, teamMembers, teams, users } from '../../../../drizzle/schema.js'
 import { AttendeeSchema, LocationModeSchema } from '../../../shared/schemas/index.js'
 
 const MAX_DURATION_MS = 24 * 60 * 60 * 1000
@@ -16,6 +16,9 @@ export const externalLogRequestSchema = z.object({
   ownerEmail: z.string().trim().toLowerCase().max(320).email(),
   // A type name on the person's team, matched without regard to case.
   activityType: z.string().trim().min(1).max(200).default('Demo'),
+  // v1.482+: a Subtype of that type, by name in any case. Ignored when the
+  // team has Subtypes off or no Subtype has that name (see result.subtype).
+  subtype: z.string().trim().min(1).max(200).optional(),
   title: z.string().trim().min(1).max(500),
   startDatetime: z.string().datetime({ offset: true }),
   endDatetime: z.string().datetime({ offset: true }),
@@ -43,6 +46,8 @@ export interface ExternalLogResult {
   teamId: string
   teamName: string
   activityType: string
+  /** The Subtype the activity got, or null (none asked for, Subtypes off, or no match). */
+  subtype: string | null
   startDatetime: string
 }
 
@@ -63,7 +68,7 @@ async function findOwner(email: string) {
 /** The person's default team when they are a member of it, else their first active team (by name). */
 async function pickTeam(userId: string, defaultTeamId: string | null) {
   const rows = await db
-    .select({ id: teams.id, name: teams.name })
+    .select({ id: teams.id, name: teams.name, subtypesEnabled: teams.subtypesEnabled })
     .from(teamMembers)
     .innerJoin(teams, eq(teams.id, teamMembers.teamId))
     .where(and(eq(teamMembers.userId, userId), eq(teams.isActive, true)))
@@ -86,6 +91,15 @@ async function findType(teamId: string, name: string) {
   return row ?? null
 }
 
+/** The type's Subtypes, in the order the admin set. */
+async function subtypesOf(typeId: string) {
+  return db
+    .select({ id: teamActivityTypeSubtypes.id, name: teamActivityTypeSubtypes.name })
+    .from(teamActivityTypeSubtypes)
+    .where(eq(teamActivityTypeSubtypes.teamActivityTypeId, typeId))
+    .orderBy(asc(teamActivityTypeSubtypes.sortOrder), asc(teamActivityTypeSubtypes.name))
+}
+
 async function existingByRef(ref: string) {
   const [row] = await db
     .select({
@@ -95,6 +109,7 @@ async function existingByRef(ref: string) {
       teamId: activities.teamId,
       startDatetime: activities.startDatetime,
       typeName: teamActivityTypes.name,
+      subtypeName: activities.subtypeName,
       teamName: teams.name,
       ownerEmail: users.email,
     })
@@ -117,6 +132,7 @@ function asResult(row: NonNullable<Awaited<ReturnType<typeof existingByRef>>>, d
     teamId: row.teamId,
     teamName: row.teamName,
     activityType: row.typeName,
+    subtype: row.subtypeName,
     startDatetime: row.startDatetime.toISOString(),
   }
 }
@@ -152,6 +168,11 @@ export async function logExternalActivity(body: ExternalLogRequest): Promise<Ext
   const end = new Date(body.endDatetime)
   const hours = body.effortHours ?? Math.min(24, Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 100) / 100)
 
+  const wanted = body.subtype?.toLowerCase()
+  const subtype = wanted && team.subtypesEnabled
+    ? (await subtypesOf(type.id)).find((st) => st.name.toLowerCase() === wanted) ?? null
+    : null
+
   let created = true
   try {
     await db.insert(activities).values({
@@ -159,6 +180,8 @@ export async function logExternalActivity(body: ExternalLogRequest): Promise<Ext
       teamId: team.id,
       title: body.title,
       activityTypeId: type.id,
+      subtypeId: subtype?.id ?? null,
+      subtypeName: subtype?.name ?? null,
       status: 'draft',
       startDatetime: start,
       endDatetime: end,
@@ -179,3 +202,51 @@ export async function logExternalActivity(body: ExternalLogRequest): Promise<Ext
   return { ok: true, result: asResult(row, !created), created }
 }
 
+
+export const externalSubtypesQuerySchema = z.object({
+  ownerEmail: z.string().trim().toLowerCase().max(320).email(),
+  activityType: z.string().trim().min(1).max(200).default('Demo'),
+})
+
+export interface ExternalSubtypesResult {
+  version: 1
+  ownerEmail: string
+  teamId: string
+  teamName: string
+  activityType: string
+  /** False when the team has Subtypes turned off; `subtypes` is then empty. */
+  subtypesEnabled: boolean
+  subtypes: { id: string; name: string }[]
+}
+
+export type ExternalSubtypesOutcome =
+  | { ok: true; result: ExternalSubtypesResult }
+  | { ok: false; status: number; error: string }
+
+/**
+ * GET /api/v1/activities/subtypes (v1.482+): the Subtypes a call to
+ * logExternalActivity would accept for this person and type, resolved the
+ * same way (same team pick, same type match), so a caller can offer them
+ * before it logs anything.
+ */
+export async function listExternalSubtypes(query: z.infer<typeof externalSubtypesQuerySchema>): Promise<ExternalSubtypesOutcome> {
+  const owner = await findOwner(query.ownerEmail)
+  if (!owner) return { ok: false, status: 422, error: 'errors.activity_log.user_not_found' }
+  if (owner.disabledAt) return { ok: false, status: 422, error: 'errors.activity_log.user_disabled' }
+  const team = await pickTeam(owner.id, owner.defaultTeamId)
+  if (!team) return { ok: false, status: 422, error: 'errors.activity_log.no_team' }
+  const type = await findType(team.id, query.activityType)
+  if (!type) return { ok: false, status: 422, error: 'errors.activity_log.type_not_found' }
+  return {
+    ok: true,
+    result: {
+      version: 1,
+      ownerEmail: owner.email.toLowerCase(),
+      teamId: team.id,
+      teamName: team.name,
+      activityType: type.name,
+      subtypesEnabled: team.subtypesEnabled,
+      subtypes: team.subtypesEnabled ? await subtypesOf(type.id) : [],
+    },
+  }
+}

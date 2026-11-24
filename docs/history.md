@@ -3214,3 +3214,8 @@
   (120/min, before the key check), CSRF-exempt like the effort
   POSTs. `activities.external_ref` (migration 0187, partial unique index) holds the caller's id, so a retry returns the
   first activity instead of logging twice. Audited as `activity.log_via_api`. DemoIQ is the first caller.
+- **v1.482.0** (2026-11-24) `GET /api/v1/activities/subtypes?ownerEmail=&activityType=` (same `activities:log` key and
+  checks as the log endpoint) lists the Subtypes of that person's type on the team the log call would pick, in sort
+  order, or none when the team has Subtypes off. `POST /api/v1/activities/log` takes an optional `subtype` (by name, any
+  case) and stores `subtype_id` + the `subtype_name` snapshot; no match or Subtypes off logs without one, and the
+  response's `subtype` says which it got, so a renamed Subtype never fails a log. DemoIQ uses both for its demo types.
