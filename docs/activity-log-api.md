@@ -10,7 +10,7 @@ that.
 An App Admin creates the key in **My Settings → API Keys** with only the `activities:log` scope. Only App Admins see
 that scope, and the server refuses it for anyone else. The key:
 
-- reaches `POST /api/v1/activities/log` and nothing else (`/api/*` refuses it because it lacks `rest:full`, `/api/mcp`
+- reaches `POST /api/v1/activities/log` and `GET /api/v1/activities/subtypes` and nothing else (`/api/*` refuses it because it lacks `rest:full`, `/api/mcp`
   because it lacks `mcp:read`)
 - needs its owner to still be an active App Admin with no pending password change on every call, not only when it was
   made. Disabling or demoting the owner stops it.
@@ -44,6 +44,7 @@ Content-Type: application/json
 |---|---|
 | `ownerEmail` | The person the activity belongs to, matched in any case. |
 | `activityType` | An active activity type on that person's team, by name in any case (a type shared with the team counts). Default `Demo`. |
+| `subtype` | Optional (v1.482+). A Subtype of that type, by name in any case. Ignored when the team has Subtypes off or none has that name; the response's `subtype` says what was stored. |
 | `title` | Up to 500 characters. |
 | `startDatetime`, `endDatetime` | ISO 8601 with a zone. The end must be after the start and within 24 hours. |
 | `effortHours` | Optional, 0–24. Defaults to the time between start and end. |
@@ -75,6 +76,7 @@ The team is the person's default team when they are a member of it, otherwise th
     "teamId": "c7d2...",
     "teamName": "Sales Engineering",
     "activityType": "Demo",
+    "subtype": "Technical Demo",
     "startDatetime": "2026-11-20T15:00:00.000Z",
     "url": "https://impactiq.example.com/?openActivityId=8a1e...&startDate=2026-11-20"
   },
@@ -98,3 +100,33 @@ person approved it.
 | 422 | `errors.activity_log.type_not_found` | No active type with that name on the user's team |
 | 428 | `errors.must_change_password` | The key owner must change their password first |
 | 429 | `errors.rate_limited` | Per-key limit reached (`Retry-After`) |
+
+## Subtypes (v1.482+)
+
+Lists the Subtypes a log call for this person and type would accept, so the caller can offer them first. DemoIQ uses it
+for its demo types. Same key, checks and limits as the log endpoint; the team and type are picked the same way.
+
+```
+GET /api/v1/activities/subtypes?ownerEmail=ana@example.com&activityType=Demo
+Authorization: Bearer iqk_...
+```
+
+```json
+{
+  "data": {
+    "version": 1,
+    "ownerEmail": "ana@example.com",
+    "teamId": "c7d2...",
+    "teamName": "Sales Engineering",
+    "activityType": "Demo",
+    "subtypesEnabled": true,
+    "subtypes": [{ "id": "4b1f...", "name": "Executive Demo" }, { "id": "9e0a...", "name": "Technical Demo" }]
+  },
+  "error": null,
+  "meta": {}
+}
+```
+
+Subtypes come in the order set on Admin → Activity Types. `subtypesEnabled` is false and `subtypes` empty when the team
+has Subtypes turned off. Errors are the log endpoint's: `400 invalid_request`, `401`/`403` for the key,
+`422 user_not_found`, `user_disabled`, `no_team` or `type_not_found`, `429`.

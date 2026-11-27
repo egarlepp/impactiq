@@ -2011,6 +2011,6 @@ a user would look under; a security fix is `security`, not `fix`. The App Update
 
 ---
 
-*Last updated: November 2026 — v1.481.0 (`POST /api/v1/activities/log`: an App Admin's `activities:log` key lets DemoIQ log a demo as a draft for the SE by email; contract in `docs/activity-log-api.md`. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
+*Last updated: November 2026 — v1.482.0 (`GET /api/v1/activities/subtypes` and an optional `subtype` on `POST /api/v1/activities/log`, so DemoIQ's demo types are the team's Demo Subtypes; contract in `docs/activity-log-api.md`. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
 *Maintainer: the repository owner*
 *Repo: https://github.com/egarlepp/impactiq*

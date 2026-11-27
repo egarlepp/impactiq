@@ -1,5 +1,6 @@
 // POST /api/v1/activities/log (v1.481.0): another tool (DemoIQ, after a demo)
-// logs an activity for a user it names by email. Contract in
+// logs an activity for a user it names by email. GET /api/v1/activities/subtypes
+// (v1.482.0) lists the Subtypes it may name for that person. Contract in
 // docs/activity-log-api.md.
 //
 // Only an iqk_ key with the activities:log scope gets in: no session cookie,
@@ -17,7 +18,7 @@ import { mcpRateCheck } from '../middleware/mcp-rate-limit.js'
 import { rateLimit } from '../middleware/rate-limit.js'
 import { logAudit } from '../services/audit/log.js'
 import { getPublicBaseUrl } from '../services/config/integrations.js'
-import { externalLogRequestSchema, logExternalActivity } from '../services/activities/externalLog.js'
+import { externalLogRequestSchema, externalSubtypesQuerySchema, listExternalSubtypes, logExternalActivity } from '../services/activities/externalLog.js'
 
 export const ACTIVITY_LOG_SCOPE = 'activities:log'
 // Bearer keys only, so the CSRF check is skipped for this path (csrf.ts).
@@ -103,6 +104,35 @@ activityLogApiRouter.post('/activities/log', perIpLimit, async (req, res) => {
     res.status(outcome.created ? 201 : 200).json({ data: { ...result, url }, error: null, meta: { deduped: result.deduped } })
   } catch (err) {
     console.error('[activity-log-api] Could not log activity:', err instanceof Error ? err.message : err)
+    res.status(500).json({ data: null, error: 'errors.internal', meta: {} })
+  }
+})
+
+activityLogApiRouter.get('/activities/subtypes', perIpLimit, async (req, res) => {
+  try {
+    const keyOwner = await activityLogKeyOwner(req, res)
+    if (!keyOwner) return
+    const parsed = externalSubtypesQuerySchema.safeParse({
+      ownerEmail: typeof req.query.ownerEmail === 'string' ? req.query.ownerEmail : undefined,
+      activityType: typeof req.query.activityType === 'string' ? req.query.activityType : undefined,
+    })
+    if (!parsed.success) {
+      res.status(400).json({
+        data: null,
+        error: 'errors.activity_log.invalid_request',
+        meta: { issues: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })) },
+      })
+      return
+    }
+    const outcome = await listExternalSubtypes(parsed.data)
+    if (!outcome.ok) {
+      res.status(outcome.status).json({ data: null, error: outcome.error, meta: {} })
+      return
+    }
+    res.set('Cache-Control', 'private, no-store')
+    res.json({ data: outcome.result, error: null, meta: {} })
+  } catch (err) {
+    console.error('[activity-log-api] Could not list subtypes:', err instanceof Error ? err.message : err)
     res.status(500).json({ data: null, error: 'errors.internal', meta: {} })
   }
 })

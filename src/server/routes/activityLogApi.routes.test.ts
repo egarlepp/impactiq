@@ -66,6 +66,18 @@ beforeAll(async () => {
   const [shared] = await testDb.insert(schema.teamActivityTypes).values({ teamId: other!.id, name: 'Workshop', sortOrder: 3 }).returning()
   await testDb.insert(schema.activityTypeTeams).values({ activityTypeId: shared!.id, teamId: team!.id })
 
+  // Alpha SE has Subtypes on, with two for Demo; Zulu Channel has them off.
+  await testDb.update(schema.teams).set({ subtypesEnabled: true }).where(drizzle.eq(schema.teams.id, team!.id))
+  const [alphaDemo] = await testDb.select().from(schema.teamActivityTypes)
+    .where(drizzle.and(drizzle.eq(schema.teamActivityTypes.teamId, team!.id), drizzle.eq(schema.teamActivityTypes.name, 'Demo')))
+  const [zuluDemo] = await testDb.select().from(schema.teamActivityTypes)
+    .where(drizzle.and(drizzle.eq(schema.teamActivityTypes.teamId, other!.id), drizzle.eq(schema.teamActivityTypes.name, 'Demo')))
+  await testDb.insert(schema.teamActivityTypeSubtypes).values([
+    { teamActivityTypeId: alphaDemo!.id, name: 'Technical Demo', sortOrder: 2 },
+    { teamActivityTypeId: alphaDemo!.id, name: 'Executive Demo', sortOrder: 1 },
+    { teamActivityTypeId: zuluDemo!.id, name: 'Partner Demo', sortOrder: 1 },
+  ])
+
   const admin = await makeUser('Ada Admin', { isAppAdmin: true })
   const leader = await makeUser('Lee Leader')
   const ana = await makeUser('Ana SE')
@@ -85,6 +97,19 @@ beforeAll(async () => {
 })
 
 type Body = { data: Record<string, unknown> | null; error: string | null; meta: Record<string, unknown> }
+
+async function get(query: Record<string, string>, key?: string) {
+  const server = app.listen(0)
+  try {
+    const { port } = server.address() as AddressInfo
+    const headers: Record<string, string> = {}
+    if (key) headers['authorization'] = `Bearer ${key}`
+    const res = await fetch(`http://127.0.0.1:${port}/api/v1/activities/subtypes?${new URLSearchParams(query)}`, { headers })
+    return { status: res.status, body: await res.json() as Body }
+  } finally {
+    server.close()
+  }
+}
 
 async function post(body: unknown, key?: string) {
   const server = app.listen(0)
@@ -161,5 +186,37 @@ describe('POST /api/v1/activities/log', () => {
     expect(bad.status).toBe(400)
     expect(bad.body.error).toBe('errors.activity_log.invalid_request')
     expect((bad.body.meta['issues'] as { path: string }[]).map((i) => i.path).sort()).toEqual(['endDatetime', 'externalRef'])
+  })
+})
+
+describe('Subtypes (v1.482.0)', () => {
+  it('lists the Subtypes of the person\'s type, in the admin\'s order, only for activities:log keys held by an App Admin', async () => {
+    expect((await get({ ownerEmail: 'ana.se@example.com' })).status).toBe(401)
+    expect((await get({ ownerEmail: 'ana.se@example.com' }, adminRestKey)).status).toBe(403)
+    expect((await get({ ownerEmail: 'ana.se@example.com' }, leaderLogKey)).status).toBe(403)
+    const res = await get({ ownerEmail: 'ANA.SE@example.com', activityType: 'demo' }, adminKey)
+    expect(res.status).toBe(200)
+    expect(res.body.data).toMatchObject({ teamId: seTeamId, activityType: 'Demo', subtypesEnabled: true })
+    expect((res.body.data!['subtypes'] as { name: string }[]).map((st) => st.name)).toEqual(['Executive Demo', 'Technical Demo'])
+  })
+
+  it('lists none when the team has Subtypes off, and explains a bad person or type', async () => {
+    const bo = await get({ ownerEmail: 'bo.se@example.com' }, adminKey)
+    expect(bo.body.data).toMatchObject({ teamId: otherTeamId, subtypesEnabled: false, subtypes: [] })
+    expect((await get({ ownerEmail: 'nobody@example.com' }, adminKey)).body.error).toBe('errors.activity_log.user_not_found')
+    expect((await get({ ownerEmail: 'ana.se@example.com', activityType: 'Old Type' }, adminKey)).body.error).toBe('errors.activity_log.type_not_found')
+    expect((await get({ ownerEmail: 'not-an-email' }, adminKey)).status).toBe(400)
+  })
+
+  it('logs the Subtype it names, and ignores one that does not match or a team with Subtypes off', async () => {
+    const named = await post(demo({ subtype: 'technical demo' }), adminKey)
+    expect(named.status).toBe(201)
+    expect(named.body.data).toMatchObject({ subtype: 'Technical Demo' })
+    const [row] = await testDb.select().from(schema.activities).where(drizzle.eq(schema.activities.id, named.body.data!['activityId'] as string))
+    expect(row!.subtypeName).toBe('Technical Demo')
+    expect(row!.subtypeId).not.toBeNull()
+    expect((await post(demo({ subtype: 'Roadshow' }), adminKey)).body.data).toMatchObject({ subtype: null })
+    // Zulu Channel has a Partner Demo Subtype but Subtypes are off there.
+    expect((await post(demo({ ownerEmail: 'bo.se@example.com', subtype: 'Partner Demo' }), adminKey)).body.data).toMatchObject({ subtype: null })
   })
 })

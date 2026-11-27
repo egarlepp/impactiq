@@ -15,6 +15,13 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.482.0',
+    date: '2026-11-24',
+    highlights: [
+      { category: 'feature', text: 'DemoIQ can now list a person\'s Demo Subtypes and log a demo with one, so the demo types an SE picks in DemoIQ are the ones your team set up here.' },
+    ],
+  },
+  {
     version: '1.481.0',
     date: '2026-11-24',
     highlights: [
