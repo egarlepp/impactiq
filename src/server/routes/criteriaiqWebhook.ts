@@ -17,6 +17,7 @@ import { bumpCriteriaIqCacheEpoch, getCriteriaIqConfig, getCriteriaIqWebhookSecr
 import { parseCriteriaIqWebhookBody, SIGNATURE_HEADER, verifyCriteriaIqSignature } from '../services/criteriaiq/webhook.js'
 import { refreshCriteriaIqProject } from '../services/criteriaiq/primaryProjects.js'
 import { CriteriaIqError } from '../services/criteriaiq/client.js'
+import { logSafe } from '../lib/logSafe.js'
 
 export const CRITERIAIQ_WEBHOOK_PATH = '/api/webhooks/criteriaiq'
 const RECEIPT_KEEP_MS = 60 * 60 * 1000
@@ -58,7 +59,7 @@ criteriaIqWebhookRouter.post('/', express.raw({ type: () => true, limit: '64kb' 
     if (event.projectId !== null) {
       void refreshCriteriaIqProject(event.projectId).catch((err: unknown) => {
         const msg = err instanceof CriteriaIqError ? err.code : err instanceof Error ? err.message : String(err)
-        console.warn(`[criteriaiq-webhook] Could not refresh project ${event.projectId}: ${msg}`)
+        console.warn(`[criteriaiq-webhook] Could not refresh project ${logSafe(event.projectId)}: ${logSafe(msg)}`)
       })
     }
   } catch (err) {

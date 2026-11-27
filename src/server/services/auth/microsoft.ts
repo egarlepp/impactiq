@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import type { Request } from 'express'
 import { getMsIntegrationConfig } from '../config/integrations.js'
+import { microsoftLoginUrl } from './microsoftLogin.js'
 
 const ENCRYPTION_KEY = process.env['TOKEN_ENCRYPTION_KEY'] ?? '0'.repeat(64)
 
@@ -10,12 +11,12 @@ export function isMicrosoftConfigured(): boolean {
 
 function tokenEndpoint(): string {
   const tenantId = getMsIntegrationConfig()?.tenantId ?? process.env['MS_TENANT_ID'] ?? 'common'
-  return `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`
+  return microsoftLoginUrl(tenantId, '/oauth2/v2.0/token')
 }
 
 function authorizeEndpoint(): string {
   const tenantId = getMsIntegrationConfig()?.tenantId ?? process.env['MS_TENANT_ID'] ?? 'common'
-  return `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize`
+  return microsoftLoginUrl(tenantId, '/oauth2/v2.0/authorize')
 }
 
 // v1.84.0: derive the redirect_uri from the incoming request whenever we
@@ -49,7 +50,7 @@ const STATE_TTL_MS = 10 * 60 * 1000
 
 // v1.423.0: the state also signs a nonce that must match the encrypted
 // binding cookie set when the flow started (routes/auth/oauthBinding.ts).
-export function signOAuthState(userId: string, nonce: string): string {
+export function signCallbackState(userId: string, nonce: string): string {
   const expires = String(Date.now() + STATE_TTL_MS)
   const payload = `${userId}.${expires}.${nonce}`
   const sig = crypto

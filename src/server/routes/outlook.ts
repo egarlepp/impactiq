@@ -45,8 +45,8 @@ outlookRouter.get('/status', async (req, res) => {
 // activities themselves never expose it (per CLAUDE.md §10).
 outlookRouter.get('/calendar', async (req, res) => {
   const callerId = req.user!.id
-  const startIso = req.query['start'] as string | undefined
-  const endIso = req.query['end'] as string | undefined
+  const startIso = typeof req.query['start'] === 'string' ? req.query['start'] : undefined
+  const endIso = typeof req.query['end'] === 'string' ? req.query['end'] : undefined
   const requestedUserId = (req.query['userId'] as string | undefined) || null
   if (!startIso || !endIso) {
     res.status(400).json({ data: null, error: 'errors.validation.date_range_required', meta: {} })
@@ -260,8 +260,8 @@ outlookRouter.get('/calendar', async (req, res) => {
 outlookRouter.get('/suggestions', async (req, res) => {
   const callerId = req.user!.id
   const teamId = req.query['teamId'] as string | undefined
-  const startIso = req.query['start'] as string | undefined
-  const endIso = req.query['end'] as string | undefined
+  const startIso = typeof req.query['start'] === 'string' ? req.query['start'] : undefined
+  const endIso = typeof req.query['end'] === 'string' ? req.query['end'] : undefined
   const requestedUserId = (req.query['userId'] as string | undefined) || null
   if (!teamId || !startIso || !endIso) { res.status(400).json({ data: null, error: 'errors.validation.date_range_required', meta: {} }); return }
 

@@ -176,8 +176,8 @@ flightDeckRoutes.patch('/teams/:teamId/flight-deck-items/reorder', requireRole('
   const validIds = new Set(existing.map((r) => r.id))
   const toReorder = parsed.data.orderedIds.filter((id) => validIds.has(id))
   await db.transaction(async (tx) => {
-    for (let i = 0; i < toReorder.length; i++) {
-      await tx.update(flightDeckItems).set({ sortOrder: i + 1, updatedAt: new Date() }).where(eq(flightDeckItems.id, toReorder[i]!))
+    for (const [i, id] of toReorder.entries()) {
+      await tx.update(flightDeckItems).set({ sortOrder: i + 1, updatedAt: new Date() }).where(eq(flightDeckItems.id, id))
     }
   })
   res.json({ data: { ok: true }, error: null, meta: {} })

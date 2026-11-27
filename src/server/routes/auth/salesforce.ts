@@ -14,8 +14,9 @@ import {
   exchangeAuthorizationCode,
   generatePkce,
   getSalesforceAuthUrl,
+  SALESFORCE_AUTHORIZE_URL_RX,
   isSalesforceConfigured,
-  signOAuthState,
+  signCallbackState,
   verifyOAuthState,
 } from '../../services/auth/salesforce.js'
 import {
@@ -38,7 +39,7 @@ salesforceAuthRoutes.get('/salesforce', requireAuth, requireCrmProvider('salesfo
   }
   const { verifier, challenge } = generatePkce()
   const nonce = generateBindingNonce()
-  const state = signOAuthState(req.user!.id, nonce)
+  const state = signCallbackState(req.user!.id, nonce)
   // On a RECONNECT, the tenant's fallback login URL may point at a
   // different environment than the org the user was originally
   // connected to (a common trap: admin-level config was set to
@@ -58,6 +59,10 @@ salesforceAuthRoutes.get('/salesforce', requireAuth, requireCrmProvider('salesfo
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
+  if (!SALESFORCE_AUTHORIZE_URL_RX.test(url)) {
+    res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
+    return
+  }
   res.redirect(url)
 })
 
@@ -349,7 +354,7 @@ salesforceAuthRoutes.get('/salesforce-admin', requireAuth, requireAppAdmin, requ
   }
   const { verifier, challenge } = generatePkce()
   const nonce = generateBindingNonce()
-  const state = signOAuthState(`admin:${req.user!.id}`, nonce)
+  const state = signCallbackState(`admin:${req.user!.id}`, nonce)
   // On RECONNECT, honor the previously-connected instance URL so we
   // don't fall back to test.salesforce.com when the tenant fallback
   // and the actual admin org differ. Mirrors the user-side fix from
@@ -362,6 +367,10 @@ salesforceAuthRoutes.get('/salesforce-admin', requireAuth, requireAppAdmin, requ
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
+  if (!SALESFORCE_AUTHORIZE_URL_RX.test(url)) {
+    res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
+    return
+  }
   res.redirect(url)
 })
 

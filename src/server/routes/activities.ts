@@ -23,6 +23,7 @@ import { HubspotError } from '../services/hubspot/client.js'
 import { getHubspotConfig } from '../services/hubspot/config.js'
 import { HUBSPOT_ID_RX } from '../../shared/hubspot.js'
 import { isActivityTypeExtraShownOn } from '../../shared/crmExtras.js'
+import { logSafe } from '../lib/logSafe.js'
 
 export const activitiesRouter = Router()
 
@@ -92,7 +93,7 @@ function maybeSyncOutlookEvent(row: { id: string; userId: string; status: string
       if (!row.isPrivateMeeting) await ensureEventTitleSynced(row.userId, eventId, row.title)
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.warn('[outlook-sync] failed for activity', row.id, err instanceof Error ? err.message : err)
+      console.warn('[outlook-sync] failed for activity', logSafe(row.id), logSafe(err))
     }
   })()
 }
@@ -1538,7 +1539,7 @@ activitiesRouter.delete('/:id', async (req, res) => {
     if (!row.crmRecordAdopted) {
       const { deleteHubspotEngagement } = await import('../services/hubspot/writeback.js')
       sfError = await deleteHubspotEngagement(row.crmRecordId, objectType)
-      if (sfError) console.warn('[/api/activities] HubSpot delete failed for', id, sfError)
+      if (sfError) console.warn('[/api/activities] HubSpot delete failed for', logSafe(id), logSafe(sfError))
     }
   } else if (row.crmRecordId) {
     try {
@@ -1553,7 +1554,7 @@ activitiesRouter.delete('/:id', async (req, res) => {
       sfError = err instanceof Error ? err.message : String(err)
       // Ignore "already deleted" so re-runs don't error.
       if (!/ENTITY_IS_DELETED|INVALID_CROSS_REFERENCE_KEY/i.test(sfError)) {
-        console.warn('[/api/activities] SF delete failed for', id, sfError)
+        console.warn('[/api/activities] SF delete failed for', logSafe(id), logSafe(sfError))
       } else {
         sfError = null
       }
@@ -1578,7 +1579,7 @@ activitiesRouter.delete('/:id', async (req, res) => {
       const { deleteCalendarEvent } = await import('../services/outlook/client.js')
       outlookDeleted = await deleteCalendarEvent(row.userId, row.outlookWritebackEventId)
     } catch (err) {
-      console.warn('[/api/activities] Outlook event delete failed for', id, err instanceof Error ? err.message : String(err))
+      console.warn('[/api/activities] Outlook event delete failed for', logSafe(id), logSafe(err))
     }
   }
 

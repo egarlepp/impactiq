@@ -6,6 +6,7 @@ import { refreshAccessToken } from '../auth/microsoft.js'
 import { getMsIntegrationConfig } from '../config/integrations.js'
 import { normalizeTimeZone } from '../../../shared/windowsTimezones.js'
 import { CLEARED_USER_INTEGRATION_ERROR, markUserIntegrationFailed, recordIntegrationCall } from '../health/integrationStatus.js'
+import { microsoftLoginUrl } from '../auth/microsoftLogin.js'
 
 // Refresh the user's stored timezone from Graph mailboxSettings if it's been
 // more than TZ_REFRESH_INTERVAL_MS since the last check, or has never been
@@ -244,7 +245,7 @@ async function getAppOnlyAccessToken(): Promise<string | null> {
   })
   let res: Response
   try {
-    res = await fetch(`https://login.microsoftonline.com/${cfg.tenantId}/oauth2/v2.0/token`, {
+    res = await fetch(microsoftLoginUrl(cfg.tenantId, '/oauth2/v2.0/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,

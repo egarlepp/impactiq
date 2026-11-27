@@ -4,6 +4,7 @@ import { getCrmProviderId } from './providerSetting.js'
 import { salesforceProvider } from './salesforceProvider.js'
 import { hubspotProvider } from './hubspotProvider.js'
 import type { CrmProvider } from './types.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 export type { CrmProvider, CrmUserSession } from './types.js'
 export { getCrmProviderId, getCrmProviderSetting, setCrmProviderId, isCrmProviderActive, clearCrmProviderCache } from './providerSetting.js'
@@ -29,7 +30,7 @@ export async function getActiveCrmProvider(): Promise<CrmProvider | null> {
 export function queueCrmActivitySync(activityId: string): void {
   void getActiveCrmProvider()
     .then((provider) => provider?.queueActivitySync(activityId))
-    .catch((err) => { console.error('[crm] queue sync failed for %s:', activityId, err) })
+    .catch((err) => { console.error('[crm] queue sync failed for %s:', logSafe(activityId), err) })
 }
 
 // Fire-and-forget note push for one queued activity_note_pushes row. A no-op

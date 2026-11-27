@@ -5,6 +5,7 @@ import { createCalendarEvent, updateCalendarEvent, OutlookScopeError, type Write
 import { getOutlookSyncSettings } from '../config/integrations.js'
 import { scheduleJob } from '../jobs/scheduler.js'
 import { writeRun } from '../jobs/writeRun.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 const BATCH_SIZE = 25
 const POLL_INTERVAL_MS = 30 * 1000
@@ -141,7 +142,7 @@ export async function processOutlookWriteback(activityId: string): Promise<void>
 // Fire-and-forget kick right after an activity is submitted/edited.
 export function kickOutlookWriteback(activityId: string): void {
   void processOutlookWriteback(activityId).catch((err) => {
-    console.error('[outlook-writeback] inline kick failed for', activityId, err)
+    console.error('[outlook-writeback] inline kick failed for', logSafe(activityId), err)
   })
 }
 

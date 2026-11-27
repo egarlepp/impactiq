@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm'
 import { db } from '../../db/index.js'
 import { systemSettings } from '../../../../drizzle/schema.js'
 import { decryptToken, encryptToken } from '../config/crypto.js'
+import { stripTrailing } from '../../lib/strings.js'
 
 // Connection to the install's CriteriaIQ: its base URL and a CriteriaIQ API
 // key (Bearer, created in CriteriaIQ under Admin › Integrations › n8n › API Keys with the
@@ -42,7 +43,7 @@ export interface CriteriaIqConfigSummary {
 
 // Trailing slashes off, so paths join cleanly.
 export function normalizeBaseUrl(raw: string): string {
-  return raw.trim().replace(/\/+$/, '')
+  return stripTrailing(raw.trim(), '/')
 }
 
 async function loadStored(): Promise<StoredConfig | null> {

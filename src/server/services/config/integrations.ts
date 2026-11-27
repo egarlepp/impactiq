@@ -3,6 +3,7 @@ import { systemSettings } from '../../../../drizzle/schema.js'
 import { inArray, eq } from 'drizzle-orm'
 import { encryptToken, decryptToken } from './crypto.js'
 import { normalizeLoginLogoDimension } from '../../../shared/loginLogoSize.js'
+import { stripTrailing } from '../../lib/strings.js'
 
 const KEY_SF = 'integration_config_salesforce'
 const KEY_MS = 'integration_config_microsoft'
@@ -92,17 +93,17 @@ export async function getPublicBaseUrl(): Promise<string | null> {
   try {
     const [row] = await db.select().from(systemSettings).where(eq(systemSettings.key, KEY_APP_PUBLIC_BASE_URL)).limit(1)
     const val = row?.value as { url?: string } | undefined
-    const stored = (val?.url ?? '').trim().replace(/\/+$/, '')
+    const stored = stripTrailing((val?.url ?? '').trim(), '/')
     if (stored) return stored
-    const envUrl = (process.env['APP_URL'] ?? '').trim().replace(/\/+$/, '')
+    const envUrl = stripTrailing((process.env['APP_URL'] ?? '').trim(), '/')
     return envUrl || null
   } catch {
-    const envUrl = (process.env['APP_URL'] ?? '').trim().replace(/\/+$/, '')
+    const envUrl = stripTrailing((process.env['APP_URL'] ?? '').trim(), '/')
     return envUrl || null
   }
 }
 export async function setPublicBaseUrl(url: string | null): Promise<void> {
-  const cleaned = (url ?? '').trim().replace(/\/+$/, '')
+  const cleaned = stripTrailing((url ?? '').trim(), '/')
   await upsert(KEY_APP_PUBLIC_BASE_URL, { url: cleaned })
 }
 

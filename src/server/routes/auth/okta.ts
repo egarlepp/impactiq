@@ -15,14 +15,15 @@ import {
   generateNonce as generateOktaNonce,
   generatePkce as generateOktaPkce,
   isOktaConfigured,
-  signOAuthState as signOktaState,
+  signCallbackState as signOktaState,
   verifyOAuthState as verifyOktaState,
   verifyOktaIdToken,
 } from '../../services/auth/okta.js'
 import { getAuthPolicy, getOktaGroupSettings } from '../../services/config/auth-policy.js'
 import { isOktaAllowUnverifiedEmail } from '../../services/config/integrations.js'
 
-import { oidcLimiter, OAUTH_PARAMS_COOKIE_PREFIX, encryptPkceParams, decryptPkceParams } from './oidc.js'
+import { oidcLimiter, OKTA_PARAMS_COOKIE_PREFIX, encryptPkceParams, decryptPkceParams } from './oidc.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 export const oktaAuthRoutes = Router()
 
@@ -52,7 +53,7 @@ oktaAuthRoutes.get('/okta', oidcLimiter, async (_req, res) => {
   // in the same browser. Not signed — the state cookie already gates access
   // and the payload is opaque per-browser.
   const secure = process.env['NODE_ENV'] === 'production' ? '; Secure' : ''
-  const cookieName = OAUTH_PARAMS_COOKIE_PREFIX + state.slice(0, 24)
+  const cookieName = OKTA_PARAMS_COOKIE_PREFIX + state.slice(0, 24)
   const cookieValue = encodeURIComponent(encryptPkceParams(pkce.verifier, nonce))
   res.setHeader('Set-Cookie', `${cookieName}=${cookieValue}; HttpOnly; Path=/; SameSite=Lax; Max-Age=600${secure}`)
   res.redirect(url)
@@ -70,7 +71,7 @@ oktaAuthRoutes.get('/callback', oidcLimiter, async (req, res) => {
   const errorParam = req.query['error']
 
   if (typeof errorParam === 'string') {
-    console.warn('[okta callback] identity provider returned an error:', errorParam.replace(/[^\w.-]/g, '').slice(0, 100))
+    console.warn('[okta callback] identity provider returned an error:', logSafe(errorParam.replace(/[^\w.-]/g, '').slice(0, 100)))
     res.redirect(`/?oktaConnect=error&reason=${ssoErrorReason(errorParam)}`)
     return
   }
@@ -84,7 +85,7 @@ oktaAuthRoutes.get('/callback', oidcLimiter, async (req, res) => {
   }
 
   // Pull the PKCE verifier + nonce cookie the /auth/okta handler minted.
-  const paramsCookieName = OAUTH_PARAMS_COOKIE_PREFIX + state.slice(0, 24)
+  const paramsCookieName = OKTA_PARAMS_COOKIE_PREFIX + state.slice(0, 24)
   const cookieHeader = req.headers['cookie'] ?? ''
   const paramsRaw = (() => {
     for (const part of cookieHeader.split(';')) {
@@ -122,7 +123,7 @@ oktaAuthRoutes.get('/callback', oidcLimiter, async (req, res) => {
     const message = err instanceof Error ? err.message : 'Unknown error'
     // Log the raw upstream detail server-side; do not reflect it to the
     // user-visible redirect (it can leak provider hints).
-    console.warn('[okta callback]', message)
+    console.warn('[okta callback]', logSafe(message))
     res.redirect('/?oktaConnect=error&reason=errors.auth.sso_failed')
     return
   }

@@ -21,15 +21,13 @@ import { applyDefaultTeamConfig } from '../../services/teams/defaults.js'
 import { deleteTeamCascade } from '../../services/teams/deleteTeam.js'
 import { subteamMembershipsForUser, subteamOptionsForUser, disallowedSubteamIds } from '../../services/teams/userSubteams.js'
 import { z } from 'zod'
+import { changedFields } from '../../lib/records.js'
+import { trimChar } from '../../lib/strings.js'
 
 export const teamsAdminRoutes = Router()
 
 function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  return trimChar(name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-'), '-')
     .slice(0, 64) || 'team'
 }
 
@@ -170,15 +168,8 @@ teamsAdminRoutes.patch('/teams/:teamId', requireAppAdmin, async (req, res) => {
   // even when the admin only edited one field.
   const [before] = await db.select().from(teams).where(eq(teams.id, teamId)).limit(1)
   const [updated] = await db.update(teams).set(parsed.data).where(eq(teams.id, teamId)).returning()
-  const beforeDiff: Record<string, unknown> = {}
-  const afterDiff: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(parsed.data)) {
-    if (before && (before as Record<string, unknown>)[k] !== v) {
-      beforeDiff[k] = (before as Record<string, unknown>)[k]
-      afterDiff[k] = v
-    }
-  }
-  await logAudit(req, { action: 'team.update', targetType: 'team', targetId: teamId, meta: { before: beforeDiff, after: afterDiff } })
+  const diff = changedFields(before, parsed.data)
+  await logAudit(req, { action: 'team.update', targetType: 'team', targetId: teamId, meta: { before: diff.before, after: diff.after } })
   res.json({ data: updated, error: null, meta: {} })
 })
 

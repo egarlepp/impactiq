@@ -20,6 +20,7 @@ import { validatePasswordComplexity, PASSWORD_MIN_LENGTH, authMethodNeedsPasswor
 import { z } from 'zod'
 import { canManageUserAlignment } from './alignment.js'
 import { pruneSubteamMembershipsForLeftTeams } from '../../services/teams/userSubteams.js'
+import { changedFields } from '../../lib/records.js'
 
 export const usersAdminRoutes = Router()
 
@@ -649,26 +650,17 @@ usersAdminRoutes.patch('/users/:userId', requireAppAdmin, async (req, res) => {
 
   // Diff — only log fields that actually changed. Structured before/after so
   // the Audit Log UI can render a proper diff table.
-  const beforeDiff: Record<string, unknown> = {}
-  const afterDiff: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(parsed.data)) {
-    if (k === 'currentPassword' || k === 'password') continue
-    if (k === 'supportedTeamIds' && Array.isArray(v)) {
-      const desired = new Set(v)
-      const changed = desired.size !== priorSupportedTeamIds.size
-        || v.some((tid) => !priorSupportedTeamIds.has(tid))
-      if (changed) {
-        beforeDiff[k] = Array.from(priorSupportedTeamIds)
-        afterDiff[k] = v
-      }
-      continue
-    }
-    if ((target as Record<string, unknown>)[k] !== v) {
-      beforeDiff[k] = (target as Record<string, unknown>)[k]
-      afterDiff[k] = v
+  const diff = changedFields(target, parsed.data, ['currentPassword', 'password', 'supportedTeamIds'])
+  const desiredTeamIds = parsed.data.supportedTeamIds
+  if (Array.isArray(desiredTeamIds)) {
+    const teamsChanged = new Set(desiredTeamIds).size !== priorSupportedTeamIds.size
+      || desiredTeamIds.some((tid) => !priorSupportedTeamIds.has(tid))
+    if (teamsChanged) {
+      diff.before = { ...diff.before, supportedTeamIds: Array.from(priorSupportedTeamIds) }
+      diff.after = { ...diff.after, supportedTeamIds: desiredTeamIds }
     }
   }
-  await logAudit(req, { action: 'user.update', targetType: 'user', targetId: userId, meta: { before: beforeDiff, after: afterDiff } })
+  await logAudit(req, { action: 'user.update', targetType: 'user', targetId: userId, meta: { before: diff.before, after: diff.after } })
   res.json({ data: updated, error: null, meta: {} })
 })
 

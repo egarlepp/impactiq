@@ -30,6 +30,7 @@ import {
 } from '../services/hubspot/projects.js'
 import { logAudit } from '../services/audit/log.js'
 import { z } from 'zod'
+import { logSafe } from '../lib/logSafe.js'
 
 // CRM-neutral reads every signed-in user needs (mounted under apiRouter,
 // which already applies requireAuth). The client uses this to hide CRM
@@ -126,7 +127,7 @@ function withSession(handler: SessionHandler): RequestHandler {
       await handler(session, req, res, provider)
     } catch (err) {
       const code = err instanceof HubspotError ? err.code : 'errors.crm.search_failed'
-      console.error('[crm] %s %s failed:', req.method, req.path, err instanceof HubspotError ? err.code : err)
+      console.error('[crm] %s %s failed:', logSafe(req.method), logSafe(req.path), err instanceof HubspotError ? logSafe(err.code) : logSafe(err))
       res.status(502).json({ data: null, error: code, meta: {} })
     }
   }

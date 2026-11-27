@@ -441,7 +441,7 @@ managerDashRoutes.get('/manager-rollup', requireAnyLeaderOrAdmin, async (req, re
   // Roll up: a node's totals = its own leaf + the recursive sum/union of all
   // descendant leaves. ACV = sum of max-ACV over the subtree's unique opps.
   interface SubNode { subteamId: string | null; subteamName: string; parentSubteamId: string | null; depth: number; hours: number; costDollars: number; activityCount: number; acv: number; uniqueContributors: number; uniqueOpps: number; uniqueAccounts: number; uniqueLeads: number; uniqueCampaigns: number }
-  const subteamBreakdownByTeam: Record<string, SubNode[]> = {}
+  const subteamBreakdownByTeam = new Map<string, SubNode[]>()
   for (const teamId of scope) {
     const leaves = leafByTeam.get(teamId) ?? new Map<string, SubLeaf>()
     const teamSubteams = activeSubteams.filter((s) => s.teamId === teamId)
@@ -497,7 +497,7 @@ managerDashRoutes.get('/manager-rollup', requireAnyLeaderOrAdmin, async (req, re
         uniqueOpps: un.opps.size, uniqueAccounts: un.accounts.size, uniqueLeads: un.leads.size, uniqueCampaigns: un.campaigns.size,
       })
     }
-    if (nodes.length > 0) subteamBreakdownByTeam[teamId] = nodes
+    if (nodes.length > 0) subteamBreakdownByTeam.set(teamId, nodes)
   }
 
   // v1.131.0: pre-compute the raw activity counts outside the response
@@ -526,7 +526,7 @@ managerDashRoutes.get('/manager-rollup', requireAnyLeaderOrAdmin, async (req, re
     meta: {
       weeks: weeksBack,
       teamIds: scope,
-      subteamsByTeam: subteamBreakdownByTeam,
+      subteamsByTeam: Object.fromEntries(subteamBreakdownByTeam),
       mostExpensiveAccount,
       topUser,
       diagnostics: {

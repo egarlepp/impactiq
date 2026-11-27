@@ -1551,6 +1551,8 @@ export async function reseedDemoData(args: { adminUserId: string; overrides?: Pa
  * Null for everyone else, whose calendar comes from Microsoft Graph.
  */
 export async function demoCalendarFor(userId: string, startIso: string, endIso: string): Promise<DemoOutlookEvent[] | null> {
+  // Dates arrive from query strings, which can be arrays at runtime.
+  if (typeof startIso !== 'string' || typeof endIso !== 'string') return null
   if (!(await isDemoCalendarUser(userId))) return null
   const flag = await readDemoOutlookFlag()
   const s = flag.settings ?? {}

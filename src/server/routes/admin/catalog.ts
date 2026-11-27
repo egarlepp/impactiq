@@ -7,6 +7,7 @@ import { requireAppAdmin } from '../../middleware/rbac.js'
 import { desc } from 'drizzle-orm'
 import { z } from 'zod'
 import { validateProductIconDataUrl } from './themes.js'
+import { definedEntries } from '../../lib/records.js'
 
 export const catalogRoutes = Router()
 
@@ -205,8 +206,7 @@ catalogRoutes.patch('/activity-templates/:id', requireAppAdmin, async (req, res)
   const parsed = schema.safeParse(req.body ?? {})
   if (!parsed.success) { res.status(400).json({ data: null, error: parsed.error.message, meta: {} }); return }
   const { activityTemplates } = await import('../../../../drizzle/schema.js')
-  const patch: Record<string, unknown> = { updatedAt: new Date() }
-  for (const [k, v] of Object.entries(parsed.data)) if (v !== undefined) patch[k] = v
+  const patch: Record<string, unknown> = { ...definedEntries(parsed.data), updatedAt: new Date() }
   const [updated] = await db.update(activityTemplates).set(patch).where(eq(activityTemplates.id, id)).returning()
   if (!updated) { res.status(404).json({ data: null, error: 'errors.not_found', meta: {} }); return }
   res.json({ data: updated, error: null, meta: {} })

@@ -39,6 +39,8 @@ import { assertPublicHttpsUrl, assertSalesforceLoginUrl } from '../../services/n
 import { safeFetch } from '../../services/net/safeFetch.js'
 import { htmlToText } from '../../services/email/rule-sender.js'
 import { validateLogoDataUrl } from './themes.js'
+import { definedEntries } from '../../lib/records.js'
+import { microsoftLoginUrl } from '../../services/auth/microsoftLogin.js'
 
 export const integrationsRoutes = Router()
 
@@ -1005,8 +1007,7 @@ integrationsRoutes.patch('/email-rules/:key', requireAppAdmin, async (req, res) 
     res.status(400).json({ data: null, error: 'errors.email_rule.slack_not_supported', meta: {} }); return
   }
   const { emailRules } = await import('../../../../drizzle/schema.js')
-  const patch: Record<string, unknown> = { updatedAt: new Date() }
-  for (const [k, v] of Object.entries(parsed.data)) if (v !== undefined) patch[k] = v
+  const patch: Record<string, unknown> = { ...definedEntries(parsed.data), updatedAt: new Date() }
   const [updated] = await db.update(emailRules).set(patch).where(eq(emailRules.key, key)).returning()
   if (!updated) { res.status(404).json({ data: null, error: 'errors.not_found', meta: {} }); return }
   try {
@@ -1336,7 +1337,7 @@ integrationsRoutes.post('/integrations/test/microsoft', requireAppAdmin, async (
   if (!cfg) { res.json({ data: { ok: false, message: 'Microsoft is not configured. Save credentials first.' }, error: null, meta: {} }); return }
   try {
     // Check the tenant's OpenID configuration endpoint.
-    const url = `https://login.microsoftonline.com/${cfg.tenantId}/v2.0/.well-known/openid-configuration`
+    const url = microsoftLoginUrl(cfg.tenantId, '/v2.0/.well-known/openid-configuration')
     const r = await fetch(url)
     if (!r.ok) {
       res.json({ data: { ok: false, message: `Microsoft tenant discovery returned ${r.status}. Check the Tenant ID.` }, error: null, meta: {} })
@@ -1384,7 +1385,7 @@ integrationsRoutes.post('/integrations/test/smtp', requireAppAdmin, async (req, 
       // Test by minting an app token via client_credentials. Verifies tenant +
       // client id + secret + that Mail.Send was consented (token will include
       // the scope claim). We deliberately don't actually send mail in the test.
-      const tokenRes = await fetch(`https://login.microsoftonline.com/${cfg.tenantId}/oauth2/v2.0/token`, {
+      const tokenRes = await fetch(microsoftLoginUrl(cfg.tenantId, '/oauth2/v2.0/token'), {
         method: 'POST',
         body: new URLSearchParams({
           client_id: cfg.clientId,

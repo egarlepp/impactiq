@@ -1,6 +1,8 @@
 import crypto from 'crypto'
 import { getAzureSsoIntegrationConfig } from '../config/integrations.js'
 import { SESSION_SECRET } from '../config/env.js'
+import { logSafe } from '../../lib/logSafe.js'
+import { microsoftLoginUrl } from './microsoftLogin.js'
 
 // Azure AD / Entra ID OIDC login provider. Mirrors services/auth/okta.ts:
 // standard OpenID Connect authorization-code flow with PKCE, an HMAC-signed
@@ -46,7 +48,7 @@ async function discoverEndpoints(tenantId: string): Promise<OidcEndpoints> {
   const tenant = encodeURIComponent(tenantId.trim())
   const cached = endpointCache.get(tenant)
   if (cached && cached.expiresAt > Date.now()) return cached.endpoints
-  const url = `https://login.microsoftonline.com/${tenant}/v2.0/.well-known/openid-configuration`
+  const url = microsoftLoginUrl(tenantId, '/v2.0/.well-known/openid-configuration')
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Azure OIDC discovery failed for ${tenant}: ${url} → ${res.status}`)
   const j = (await res.json()) as OidcEndpoints
@@ -60,7 +62,7 @@ async function discoverEndpoints(tenantId: string): Promise<OidcEndpoints> {
   return j
 }
 
-export function signOAuthState(nonce: string): string {
+export function signCallbackState(nonce: string): string {
   const expires = String(Date.now() + STATE_TTL_MS)
   const payload = `${nonce}.${expires}`
   const sig = crypto.createHmac('sha256', Buffer.from(ENCRYPTION_KEY, 'hex')).update(payload).digest('hex')
@@ -100,7 +102,7 @@ export async function getAzureAuthUrl(state: string, opts: { nonce: string; code
   try {
     endpoints = await discoverEndpoints(cfg.tenantId)
   } catch (err) {
-    console.warn('[azure-sso] discovery failed:', err)
+    console.warn('[azure-sso] discovery failed:', logSafe(err))
     return null
   }
   const params = new URLSearchParams({

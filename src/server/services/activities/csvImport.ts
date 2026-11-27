@@ -6,6 +6,9 @@ import { and, eq, inArray } from 'drizzle-orm'
 // quotes ("" → "). No streaming; the request-body size limit already caps
 // input to ~256kb which is roughly 3-4k rows.
 function parseCsv(text: string): string[][] {
+  // The text comes from a request body; a non-string (an object with a huge
+  // `length`) must never drive the loop below.
+  if (typeof text !== 'string') throw new Error('CSV input must be a string')
   const rows: string[][] = []
   let row: string[] = []
   let field = ''
@@ -105,8 +108,8 @@ export async function planImport(csvText: string, opts: ImportOptions): Promise<
 
   for (let r = 0; r < dataRows.length; r++) {
     const cells = dataRows[r]!
-    const raw: Record<string, string> = {}
-    headers.forEach((h, i) => { raw[h] = (cells[i] ?? '').trim() })
+    // Keys are the file's own header names, so build the row with own properties.
+    const raw: Record<string, string> = Object.fromEntries(headers.map((h, i) => [h, (cells[i] ?? '').trim()]))
     const errors: string[] = []
 
     // Date + optional time

@@ -55,6 +55,7 @@ import { normalizeStoredTimezones } from './services/outlook/normalizeStoredTime
 import { initErrorTracking, errorTrackingMiddleware } from './services/observability/errorTracking.js'
 import { holdJobsUntil } from './services/jobs/scheduler.js'
 import { noteReadyCall } from './services/health/readiness.js'
+import { logSafe } from './lib/logSafe.js'
 
 // v1.414.0: optional, off unless SENTRY_DSN is set (CLAUDE.md §17). Started
 // before the app so errors thrown while wiring routes are caught too.
@@ -85,7 +86,7 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const ms = Number(process.hrtime.bigint() - start) / 1e6
     if (REQUEST_TIMING_LOG || ms >= SLOW_REQUEST_MS) {
-      console.log(`[req] ${res.statusCode} ${req.method} ${req.originalUrl.split('?')[0]} ${ms.toFixed(0)}ms`)
+      console.log(`[req] ${res.statusCode} ${logSafe(req.method)} ${logSafe(req.originalUrl.split('?')[0])} ${ms.toFixed(0)}ms`)
     }
   })
   next()

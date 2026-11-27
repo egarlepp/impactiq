@@ -5,6 +5,7 @@ import { evaluateNudges } from './engine.js'
 import { deliverSlackNudge } from './slack.js'
 import { deliverSlackDmToUser } from '../slack/dm.js'
 import { emitNudgeSent } from '../webhooks/events.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 // v1.433.0: moved here from routes/notifications.ts so the scheduled
 // notification_sweep job (services/nudge/sweep.ts) runs the exact same
@@ -161,7 +162,7 @@ export async function syncNudgeNotifications(userId: string, teamId: string | nu
     } catch (err) {
       failed += 1
       // eslint-disable-next-line no-console
-      console.warn('[nudge-sync] failed for team', tid, err instanceof Error ? err.message : err)
+      console.warn('[nudge-sync] failed for team', logSafe(tid), logSafe(err))
     }
   }
   return { ok, failed, delivered }
