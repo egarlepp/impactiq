@@ -39,6 +39,7 @@ jobs:
           # Test files build throwaway Express apps and match error text with
           # loose regexes; they never ship, so they're left out of the scan.
           config: |
+            threat-models: local
             paths-ignore:
               - '**/*.test.ts'
               - '**/*.test.tsx'
