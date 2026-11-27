@@ -10,6 +10,7 @@ import { needsFirstAdmin } from './services/auth/firstRun.js'
 import { themesRouter } from './routes/themes.js'
 import { mcpRouter } from './routes/mcp.js'
 import { effortApiRouter } from './routes/effortApi.js'
+import { activityLogApiRouter } from './routes/activityLogApi.js'
 import { CRITERIAIQ_WEBHOOK_PATH, criteriaIqWebhookRouter } from './routes/criteriaiqWebhook.js'
 import { gongWebhookRouter } from './routes/gongWebhook.js'
 import { GONG_WEBHOOK_PATH } from '../shared/gong.js'
@@ -206,6 +207,8 @@ if (SETUP_MODE) {
   // v1.448.0: effort:read keys only (CriteriaIQ), so it sits before the
   // session-authenticated /api router.
   app.use('/api/v1', effortApiRouter)
+  // v1.481.0: activities:log keys only (DemoIQ logs demos as drafts), same reason.
+  app.use('/api/v1', activityLogApiRouter)
   // v1.450.0: CriteriaIQ live refresh, signed by CriteriaIQ, no session.
   app.use(CRITERIAIQ_WEBHOOK_PATH, criteriaIqWebhookRouter)
   // v1.456.0: Gong's "Fire webhook" rule, signed by Gong, no session.

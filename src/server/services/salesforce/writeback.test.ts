@@ -86,6 +86,7 @@ function makeActivity(overrides: Partial<Activity> = {}): Activity {
     outlookDeletedAt: null,
     outlookDeletedKept: false,
     isArchived: false,
+    externalRef: null,
   }
   return { ...base, ...overrides }
 }

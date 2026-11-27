@@ -6,6 +6,7 @@ import { Input } from '../ui/input.js'
 import { Label } from '../ui/label.js'
 import { Spinner } from '../ui/spinner.js'
 import { api } from '../../lib/api.js'
+import { useCurrentUser } from '../../hooks/useCurrentUser.js'
 
 interface ApiKeyRow {
   id: string
@@ -17,7 +18,7 @@ interface ApiKeyRow {
   scopes?: string[]
 }
 
-type Scope = 'rest:full' | 'mcp:read' | 'effort:read'
+type Scope = 'rest:full' | 'mcp:read' | 'effort:read' | 'activities:log'
 
 // Same JSON shape as Admin → Integrations → MCP Server's own snippets
 // (McpServerConfig.tsx) — kept in sync deliberately so a screenshot from
@@ -69,6 +70,7 @@ function ClaudeConnectBlock({ token, showTitle = true }: { token: string; showTi
 
 export function ApiKeysSection() {
   const { t } = useTranslation()
+  const { user: me } = useCurrentUser()
   const [rows, setRows] = useState<ApiKeyRow[] | null>(null)
   const [creating, setCreating] = useState(false)
   const [name, setName] = useState('')
@@ -134,11 +136,13 @@ export function ApiKeysSection() {
           {/* v1.145.0: scope picker. rest:full = classic full-access REST
               key. mcp:read = read-only access via the MCP server.
               v1.448.0: effort:read = hour totals per CRM Opportunity, the key
-              CriteriaIQ stores to show SE effort on a project. */}
+              CriteriaIQ stores to show SE effort on a project.
+              v1.481.0: activities:log = DemoIQ logs draft activities for any
+              user by email, so only App Admins see it (the server checks too). */}
           <div className="mt-3 flex flex-col gap-1">
             <Label>{t('settings.api_keys.scopes_label', 'Scopes')}</Label>
             <div className="flex flex-wrap gap-3">
-              {(['rest:full', 'mcp:read', 'effort:read'] as const).map((s) => (
+              {(me?.isAppAdmin ? (['rest:full', 'mcp:read', 'effort:read', 'activities:log'] as const) : (['rest:full', 'mcp:read', 'effort:read'] as const)).map((s) => (
                 <label key={s} className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
                   <input
                     type="checkbox"
@@ -150,6 +154,7 @@ export function ApiKeysSection() {
                   {s === 'rest:full' && <span className="text-[10px] text-gray-500">{t('settings.api_keys.scope_rest_full_hint', 'Full REST API access (legacy default)')}</span>}
                   {s === 'mcp:read' && <span className="text-[10px] text-gray-500">{t('settings.api_keys.scope_mcp_read_hint', 'Read-only access via MCP for LLM tools / n8n')}</span>}
                   {s === 'effort:read' && <span className="text-[10px] text-gray-500">{t('settings.api_keys.scope_effort_read_hint')}</span>}
+                  {s === 'activities:log' && <span className="text-[10px] text-gray-500">{t('settings.api_keys.scope_activities_log_hint')}</span>}
                 </label>
               ))}
             </div>

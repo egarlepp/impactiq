@@ -263,6 +263,7 @@
       "scope_rest_full_hint": "Vollständiger REST-API-Zugriff (Legacy-Standard)",
       "scope_mcp_read_hint": "Lesezugriff über MCP für LLM-Tools / n8n",
       "scope_effort_read_hint": "Stundensummen pro CRM-Opportunity für CriteriaIQ (sonst nichts)",
+      "scope_activities_log_hint": "Erstellt Aktivitätsentwürfe für beliebige Benutzer per E-Mail, für DemoIQ (nur App-Admins)",
       "col_scopes": "Berechtigungen",
       "mcp_connect_title": "Diesen Key mit Claude verbinden",
       "mcp_connect_desktop_label": "Claude Desktop / Claude Code — mcp.json",
