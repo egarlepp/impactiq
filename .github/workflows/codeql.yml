@@ -36,6 +36,13 @@ jobs:
         with:
           languages: javascript-typescript
           queries: security-extended
+          # Test files build throwaway Express apps and match error text with
+          # loose regexes; they never ship, so they're left out of the scan.
+          config: |
+            paths-ignore:
+              - '**/*.test.ts'
+              - '**/*.test.tsx'
+              - tests/**
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           category: /language:javascript-typescript

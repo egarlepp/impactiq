@@ -250,8 +250,7 @@ authRouter.post('/mfa/regenerate-backup-codes', requireAuth, async (req, res) =>
 })
 
 authRouter.post('/change-password', async (req, res) => {
-  const token = readSessionCookie(req)
-  const session = token ? await verifySession(token) : null
+  const session = await verifySession(readSessionCookie(req))
   if (!session || await isUserDisabled(session.userId)) {
     res.status(401).json({ data: null, error: 'errors.unauthorized', meta: {} })
     return
@@ -421,11 +420,8 @@ authRouter.post('/reset-password', async (req, res) => {
 authRouter.post('/logout', async (req, res) => {
   // Revoke the current session row (if any) so it can't be re-used even if
   // the cookie gets replayed.
-  const token = readSessionCookie(req)
-  if (token) {
-    const s = await verifySession(token)
-    if (s?.sessionId) await revokeSession(s.sessionId, s.userId)
-  }
+  const s = await verifySession(readSessionCookie(req))
+  if (s?.sessionId) await revokeSession(s.sessionId, s.userId)
   clearSessionCookie(res)
   res.json({ data: { ok: true }, error: null, meta: {} })
 })
@@ -433,8 +429,7 @@ authRouter.post('/logout', async (req, res) => {
 // GET /auth/sessions — list the caller's active sessions (marking which is
 // current so the UI can label the current row and gate revocation).
 authRouter.get('/sessions', requireAuth, async (req, res) => {
-  const token = readSessionCookie(req)
-  const current = token ? await verifySession(token) : null
+  const current = await verifySession(readSessionCookie(req))
   const rows = await db
     .select({
       id: sessionsTbl.id,
@@ -461,8 +456,7 @@ authRouter.delete('/sessions/:id', requireAuth, async (req, res) => {
 // DELETE /auth/sessions — revoke every session except the one making the
 // request. Convenience for "sign me out of all other devices".
 authRouter.delete('/sessions', requireAuth, async (req, res) => {
-  const token = readSessionCookie(req)
-  const current = token ? await verifySession(token) : null
+  const current = await verifySession(readSessionCookie(req))
   const revoked = await revokeOtherSessions(req.user!.id, current?.sessionId ?? null)
   res.json({ data: { revoked }, error: null, meta: {} })
 })

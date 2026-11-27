@@ -7,4 +7,4 @@
 // compares this against the pinned branch's own CHANGELOG[0].version with no
 // separate GIT_SHA/build-time injection needed. src/client/lib/version.ts
 // re-exports this verbatim for existing client call sites.
-export const APP_VERSION = '1.482.0'
+export const APP_VERSION = '1.482.1'

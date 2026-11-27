@@ -59,7 +59,11 @@ export async function issueSession(userId: string, req?: Request, mfaMethod?: st
   return raw
 }
 
-export async function verifySession(token: string): Promise<{ userId: string; sessionId: string } | null> {
+// Takes the raw cookie value, or null/undefined when the request carried none,
+// so routes call `verifySession(readSessionCookie(req))` with no branch on the
+// cookie of their own: the only check that decides anything is this lookup.
+export async function verifySession(token: string | null | undefined): Promise<{ userId: string; sessionId: string } | null> {
+  if (typeof token !== 'string' || token.length === 0) return null
   // Opaque token → hashed lookup in sessions.
   const now = new Date()
   const tokenHash = hashToken(token)

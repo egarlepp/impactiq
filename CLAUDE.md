@@ -1783,6 +1783,9 @@ Lessons from the release history (`docs/history.md` has the full story for each)
   `fetch()`. It checks the URL, re-checks every address at connect time (undici dispatcher, so DNS rebinding can't slip
   past) and never follows redirects. Pass `allowPrivateNetwork` only where the admin opted in. Tests that stub the global
   fetch mock `safeFetch` to delegate to it (see `services/ai/webhook.test.ts`).
+- **Rate limits** *(v1.482.1+)*: build them with `rateLimit()` / `rateLimitDynamic()` (`middleware/rate-limit.ts`, on
+  express-rate-limit), never a hand-rolled counter: code scanning only recognizes known libraries. Check a session with
+  `verifySession(readSessionCookie(req))`, never `token ? verifySession(token) : null`.
 - **Query params**: read with `typeof x === 'string' ? x : undefined`, never an `as string` cast. Escape SOQL literals
   with `safeSoqlLiteral()`.
 - **Client fetches on a changing key** (week, user) need a stale-response guard; `useEffect` deps must be primitives,
@@ -2011,6 +2014,6 @@ a user would look under; a security fix is `security`, not `fix`. The App Update
 
 ---
 
-*Last updated: November 2026 — v1.482.0 (`GET /api/v1/activities/subtypes` and an optional `subtype` on `POST /api/v1/activities/log`, so DemoIQ's demo types are the team's Demo Subtypes; contract in `docs/activity-log-api.md`. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
+*Last updated: November 2026 — v1.482.1 (all open CodeQL alerts cleared: the rate limiters run on express-rate-limit, `verifySession()` takes the raw cookie value, HubSpot notes lose nested tags. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
 *Maintainer: the repository owner*
 *Repo: https://github.com/egarlepp/impactiq*

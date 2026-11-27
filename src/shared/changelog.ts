@@ -15,6 +15,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.482.1',
+    date: '2026-11-27',
+    highlights: [
+      { category: 'security', text: 'Every request limit in the app now runs on a standard rate-limiting library, so GitHub code scanning recognizes it. The limits themselves, and Admin → Integrations → Rate Limiting, work as before.' },
+      { category: 'security', text: 'Sign-in checks no longer branch on whether a session cookie was sent: every route hands the cookie straight to the server-side session lookup.' },
+      { category: 'security', text: 'HubSpot meeting notes shown in Historical Activity have their HTML tags stripped completely, even when tags are nested inside each other.' },
+    ],
+  },
+  {
     version: '1.482.0',
     date: '2026-11-24',
     highlights: [

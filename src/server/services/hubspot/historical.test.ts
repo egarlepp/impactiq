@@ -47,6 +47,7 @@ describe('helpers', () => {
   it('turns meeting notes HTML into plain text', () => {
     expect(htmlToText('<p>Agenda &amp; goals</p><p>Next:<br/>demo&nbsp;day</p>')).toBe('Agenda & goals\nNext:\ndemo day')
     expect(htmlToText('<p></p>')).toBeNull()
+    expect(htmlToText('a<<b>script>alert(1)</script>b')).not.toMatch(/</)
     expect(htmlToText(null)).toBeNull()
   })
 

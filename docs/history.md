@@ -3219,3 +3219,12 @@
   order, or none when the team has Subtypes off. `POST /api/v1/activities/log` takes an optional `subtype` (by name, any
   case) and stores `subtype_id` + the `subtype_name` snapshot; no match or Subtypes off logs without one, and the
   response's `subtype` says which it got, so a renamed Subtype never fails a log. DemoIQ uses both for its demo types.
+- **v1.482.1** (2026-11-27) Cleared all 111 open CodeQL alerts. `rateLimit()` / `rateLimitDynamic()`
+  (`middleware/rate-limit.ts`) now return express-rate-limit middleware (a server dependency) with our own fixed-window
+  store (`FixedWindowStore`: same per-key window, live window length, expired-bucket sweep), the same 429 envelope and
+  Retry-After, and no library headers; CodeQL only counts known libraries as rate limiting, so the global limiter in
+  `index.ts` now covers every route for `js/missing-rate-limiting` (101 alerts). `verifySession()` takes
+  `string | null | undefined` and routes call `verifySession(readSessionCookie(req))` instead of branching on the cookie
+  (`js/user-controlled-bypass`, 8). HubSpot `htmlToText()` strips tags until none remain
+  (`js/incomplete-multi-character-sanitization`). The CodeQL workflow skips `*.test.ts(x)` and `tests/**` (the regex and
+  three rate-limit alerts were in tests) and prints every finding in its job log.
