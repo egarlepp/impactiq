@@ -18,8 +18,7 @@ themesRouter.get('/active', async (req, res) => {
   // hits — those still see is_active branding.
   let theme: typeof appThemes.$inferSelect | null = null
   try {
-    const token = readSessionCookie(req)
-    const session = token ? await verifySession(token) : null
+    const session = await verifySession(readSessionCookie(req))
     if (session) {
       const [u] = await db.select({ defaultTeamId: users.defaultTeamId }).from(users).where(eq(users.id, session.userId)).limit(1)
       if (u?.defaultTeamId) {
@@ -49,8 +48,7 @@ themesRouter.get('/active', async (req, res) => {
 // router. Requires session but no admin gate — team admins pick their
 // team's theme from this list too.
 themesRouter.get('/', async (req, res) => {
-  const token = readSessionCookie(req)
-  const session = token ? await verifySession(token) : null
+  const session = await verifySession(readSessionCookie(req))
   if (!session) { res.status(401).json({ data: null, error: 'Unauthorized', meta: {} }); return }
   const rows = await db.select({ id: appThemes.id, name: appThemes.name, isActive: appThemes.isActive }).from(appThemes).orderBy(appThemes.createdAt)
   res.json({ data: rows, error: null, meta: {} })

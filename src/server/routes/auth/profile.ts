@@ -22,8 +22,7 @@ export const profileAuthRoutes = Router()
 
 // GET /auth/me — returns the current user + their team roles, or 401.
 profileAuthRoutes.get('/me', async (req, res) => {
-  const token = readSessionCookie(req)
-  const session = token ? await verifySession(token) : null
+  const session = await verifySession(readSessionCookie(req))
   if (!session) {
     res.status(401).json({ data: null, error: 'errors.unauthorized', meta: {} })
     return
@@ -136,8 +135,7 @@ profileAuthRoutes.get('/me', async (req, res) => {
 // context is denormalized in so the card can show the manager without a
 // second round-trip.
 profileAuthRoutes.get('/me/teams', async (req, res) => {
-  const token = readSessionCookie(req)
-  const session = token ? await verifySession(token) : null
+  const session = await verifySession(readSessionCookie(req))
   if (!session) { res.status(401).json({ data: null, error: 'errors.unauthorized', meta: {} }); return }
   const userId = session.userId
   const { teams, subteams, subteamUsers } = await import('../../../../drizzle/schema.js')

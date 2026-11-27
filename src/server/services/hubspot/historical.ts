@@ -125,10 +125,17 @@ const ENTITIES: Record<string, string> = { '&nbsp;': ' ', '&amp;': '&', '&lt;': 
 // Meeting notes are HTML in HubSpot; history shows plain text.
 export function htmlToText(html: string | null): string | null {
   if (!html) return null
-  const text = html
+  let stripped = html
     .replace(/<\s*br\s*\/?>/gi, '\n')
     .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
-    .replace(/<[^>]*>/g, '')
+  // Strip tags until none are left: one pass over "<scr<b>ipt>" would leave
+  // "<script>" behind.
+  let previous: string
+  do {
+    previous = stripped
+    stripped = stripped.replace(/<[^>]*>/g, '')
+  } while (stripped !== previous)
+  const text = stripped
     .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (m) => ENTITIES[m] ?? m)
     .replace(/\n{3,}/g, '\n\n')
     .trim()
