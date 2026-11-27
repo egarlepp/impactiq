@@ -99,7 +99,8 @@ export async function hubspotRequest(path: string, opts: HubspotRequestOptions =
     if (opts.search) await generalLimiter.acquire()
     let res: Response
     try {
-      res = await fetch(url, {
+      // Fixed origin as a literal prefix: only the path and query come from the caller.
+      res = await fetch(`https://api.hubapi.com/${url.pathname.slice(1)}${url.search}`, {
         method: opts.method ?? 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -14,7 +14,7 @@ import {
   exchangeAuthorizationCode,
   generatePkce,
   getSalesforceAuthUrl,
-  SALESFORCE_AUTHORIZE_URL_RX,
+  isSalesforceAuthorizeUrl,
   isSalesforceConfigured,
   signCallbackState,
   verifyOAuthState,
@@ -26,6 +26,14 @@ import {
   generateBindingNonce,
   setOAuthBindingCookie,
 } from './oauthBinding.js'
+
+// The browser only ever goes to a Salesforce host over HTTPS, on the OAuth
+// authorize path. getSalesforceAuthUrl() already falls back to the standard
+// login host; this re-checks the final URL right before the redirect.
+function salesforceRedirectTarget(raw: string): string | null {
+  if (!isSalesforceAuthorizeUrl(raw)) return null
+  return new URL(raw).toString()
+}
 
 export const salesforceAuthRoutes = Router()
 
@@ -59,11 +67,12 @@ salesforceAuthRoutes.get('/salesforce', requireAuth, requireCrmProvider('salesfo
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
-  if (!SALESFORCE_AUTHORIZE_URL_RX.test(url)) {
+  const target = salesforceRedirectTarget(url)
+  if (!target) {
     res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
     return
   }
-  res.redirect(url)
+  res.redirect(target)
 })
 
 // GET /auth/salesforce/callback — exchange code, encrypt + persist tokens, redirect home.
@@ -367,11 +376,12 @@ salesforceAuthRoutes.get('/salesforce-admin', requireAuth, requireAppAdmin, requ
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
-  if (!SALESFORCE_AUTHORIZE_URL_RX.test(url)) {
+  const target = salesforceRedirectTarget(url)
+  if (!target) {
     res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
     return
   }
-  res.redirect(url)
+  res.redirect(target)
 })
 
 // v1.73.0: cache the live health-check for 60s so a page that loads

@@ -10,7 +10,7 @@ export function isValidMicrosoftTenant(tenantId: string): boolean {
   return TENANT_RX.test(tenantId) && !tenantId.includes('..')
 }
 
-export function microsoftLoginUrl(tenantId: string, path: '/oauth2/v2.0/token' | '/oauth2/v2.0/authorize' | '/v2.0/.well-known/openid-configuration'): string {
+export function microsoftIdentityUrl(tenantId: string, path: '/oauth2/v2.0/token' | '/oauth2/v2.0/authorize' | '/v2.0/.well-known/openid-configuration'): string {
   const tenant = tenantId.trim()
   if (!isValidMicrosoftTenant(tenant)) throw new Error('Microsoft tenant id is not valid')
   return `${MICROSOFT_LOGIN_ORIGIN}/${encodeURIComponent(tenant)}${path}`

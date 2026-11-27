@@ -16,7 +16,7 @@ import { decryptToken } from '../config/crypto.js'
 import { getEmailIntegrationConfig } from '../config/integrations.js'
 import * as net from 'node:net'
 import * as tls from 'node:tls'
-import { microsoftLoginUrl } from '../auth/microsoftLogin.js'
+import { microsoftIdentityUrl } from '../auth/microsoftIdentity.js'
 
 export interface InlineImageAttachment {
   contentId: string
@@ -93,7 +93,7 @@ let cachedAppToken: { token: string; expiresAt: number } | null = null
 
 async function getAppToken(tenantId: string, clientId: string, clientSecret: string): Promise<string> {
   if (cachedAppToken && cachedAppToken.expiresAt > Date.now() + 60_000) return cachedAppToken.token
-  const url = microsoftLoginUrl(tenantId, '/oauth2/v2.0/token')
+  const url = microsoftIdentityUrl(tenantId, '/oauth2/v2.0/token')
   const body = new URLSearchParams({
     client_id: clientId,
     client_secret: clientSecret,

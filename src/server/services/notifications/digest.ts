@@ -160,7 +160,7 @@ export async function tickDigest(now: Date = new Date(), targetHour = DIGEST_HOU
         continue
       }
       await db.update(userNotificationPrefs).set({ lastDigestAt: now }).where(eq(userNotificationPrefs.userId, u.userId))
-      console.log(`[digest] sent to ${logSafe(u.email)} (${items.length} items, via ${result.emailed && emailCfg ? emailCfg.authMethod : 'slack'})`)
+      console.log(`[digest] sent to ${logSafe(u.email)} (${items.length} items, via ${logSafe(result.emailed && emailCfg ? emailCfg.authMethod : 'slack')})`)
       sent++
     } catch (err) {
       console.warn(`[digest] failed for user ${u.userId}:`, err)

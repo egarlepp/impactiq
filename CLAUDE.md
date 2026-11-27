@@ -1788,7 +1788,7 @@ Lessons from the release history (`docs/history.md` has the full story for each)
   `verifySession(readSessionCookie(req))`, never `token ? verifySession(token) : null`.
 - **Code scanning** *(v1.482.2+)*: log a request- or integration-sourced value through `logSafe()` (`lib/logSafe.ts`);
   build objects from request keys with `definedEntries()` / `changedFields()` (`lib/records.ts`) or a `Map`, never
-  `obj[key] = v`; build Microsoft login URLs with `microsoftLoginUrl()`; trim repeated characters with `stripTrailing()` /
+  `obj[key] = v`; build Microsoft login URLs with `microsoftIdentityUrl()`; trim repeated characters with `stripTrailing()` /
   `trimChar()` (`lib/strings.ts`), not `/x+$/`. PR scans cover the whole codebase, so a PR's CodeQL run shows every open
   alert, not only those on changed lines.
 - **Query params**: read with `typeof x === 'string' ? x : undefined`, never an `as string` cast. Escape SOQL literals
@@ -2019,6 +2019,6 @@ a user would look under; a security fix is `security`, not `fix`. The App Update
 
 ---
 
-*Last updated: November 2026 — v1.482.2 (the remaining 48 CodeQL alerts cleared: `logSafe()` for logged request values, `lib/records.ts` helpers instead of dynamic keys, `microsoftLoginUrl()` for tenant URLs, linear-time trimming in `lib/strings.ts`; PR scans now cover the whole codebase. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
+*Last updated: November 2026 — v1.482.2 (the remaining 48 CodeQL alerts cleared: `logSafe()` for logged request values, `lib/records.ts` helpers instead of dynamic keys, `microsoftIdentityUrl()` for tenant URLs, linear-time trimming in `lib/strings.ts`; PR scans now cover the whole codebase. Full version history is in `docs/history.md`; this footer only tracks the most recent release.)*
 *Maintainer: the repository owner*
 *Repo: https://github.com/egarlepp/impactiq*

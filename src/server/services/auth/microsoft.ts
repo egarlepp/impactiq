@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import type { Request } from 'express'
 import { getMsIntegrationConfig } from '../config/integrations.js'
-import { microsoftLoginUrl } from './microsoftLogin.js'
+import { microsoftIdentityUrl } from './microsoftIdentity.js'
 
 const ENCRYPTION_KEY = process.env['TOKEN_ENCRYPTION_KEY'] ?? '0'.repeat(64)
 
@@ -11,12 +11,12 @@ export function isMicrosoftConfigured(): boolean {
 
 function tokenEndpoint(): string {
   const tenantId = getMsIntegrationConfig()?.tenantId ?? process.env['MS_TENANT_ID'] ?? 'common'
-  return microsoftLoginUrl(tenantId, '/oauth2/v2.0/token')
+  return microsoftIdentityUrl(tenantId, '/oauth2/v2.0/token')
 }
 
 function authorizeEndpoint(): string {
   const tenantId = getMsIntegrationConfig()?.tenantId ?? process.env['MS_TENANT_ID'] ?? 'common'
-  return microsoftLoginUrl(tenantId, '/oauth2/v2.0/authorize')
+  return microsoftIdentityUrl(tenantId, '/oauth2/v2.0/authorize')
 }
 
 // v1.84.0: derive the redirect_uri from the incoming request whenever we

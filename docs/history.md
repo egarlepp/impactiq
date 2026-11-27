@@ -3233,7 +3233,7 @@
   scan lists the whole codebase. Log injection (16): `logSafe()` (`lib/logSafe.ts`) strips CR/LF and caps length on any
   request- or integration-sourced value logged. Remote property injection (10): `definedEntries()` / `changedFields()`
   (`lib/records.ts`), `Object.fromEntries` and `Map` instead of `obj[key] = v`. Request forgery (7):
-  `microsoftLoginUrl()` (`services/auth/microsoftLogin.ts`) validates the tenant id (throws on an invalid one) and builds
+  `microsoftIdentityUrl()` (`services/auth/microsoftIdentity.ts`) validates the tenant id (throws on an invalid one) and builds
   every login.microsoftonline.com URL; HubSpot URLs are joined onto the fixed origin and re-checked. Salesforce sign-in
   redirects only to an `https://*.salesforce.com|force.com/services/oauth2/authorize?` URL, else the standard login host.
   ReDoS (4): `stripTrailing()` / `trimChar()` (`lib/strings.ts`) replace `/\/+$/`-style regexes. Loop bounds and type

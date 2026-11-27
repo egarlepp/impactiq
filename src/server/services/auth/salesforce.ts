@@ -114,10 +114,14 @@ export function getSalesforceAuthUrl(state: string, codeChallenge: string, hostO
   return `https://login.salesforce.com/services/oauth2/authorize?${params.toString()}`
 }
 
-export const SALESFORCE_AUTHORIZE_URL_RX = /^https:\/\/(?:[a-z0-9-]+\.)*(?:salesforce|force)\.com\/services\/oauth2\/authorize\?/i
-
+// True for an https URL on a salesforce.com / force.com host, on the OAuth
+// authorize path. Parsed rather than regex-matched, so it runs in linear time.
 export function isSalesforceAuthorizeUrl(url: string): boolean {
-  return SALESFORCE_AUTHORIZE_URL_RX.test(url)
+  let target: URL
+  try { target = new URL(url) } catch { return false }
+  const host = target.hostname.toLowerCase()
+  const salesforceHost = host === 'salesforce.com' || host.endsWith('.salesforce.com') || host === 'force.com' || host.endsWith('.force.com')
+  return target.protocol === 'https:' && salesforceHost && target.pathname === '/services/oauth2/authorize'
 }
 
 export interface SfTokenResponse {
