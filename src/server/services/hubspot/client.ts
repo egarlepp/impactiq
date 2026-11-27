@@ -60,7 +60,9 @@ export function buildHubspotUrl(path: string, query?: HubspotRequestOptions['que
   // Callers pass a path, never a host: the token only ever goes to HubSpot.
   if (!path.startsWith('/') || path.startsWith('//')) throw new Error(`HubSpot path must be absolute: ${path}`)
   // Joined onto the fixed origin as a string, so the host can never come from the path.
-  const url = new URL(`https://api.hubapi.com/${path.slice(1)}`)
+  // Each segment is percent-encoded, so an id can't add a query, fragment or new segment.
+  const encodedPath = path.slice(1).split('/').map((segment) => encodeURIComponent(segment)).join('/')
+  const url = new URL(`https://api.hubapi.com/${encodedPath}`)
   if (url.origin !== HUBSPOT_API_BASE) throw new Error(`HubSpot path must stay on ${HUBSPOT_API_BASE}`)
   for (const [k, v] of Object.entries(query ?? {})) {
     if (v !== undefined) url.searchParams.set(k, String(v))
