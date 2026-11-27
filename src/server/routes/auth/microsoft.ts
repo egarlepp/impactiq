@@ -9,7 +9,7 @@ import {
   exchangeAuthorizationCode as exchangeMsCode,
   getMicrosoftAuthUrl,
   isMicrosoftConfigured,
-  signOAuthState as signMsState,
+  signCallbackState as signMsState,
   verifyOAuthState as verifyMsState,
 } from '../../services/auth/microsoft.js'
 import {

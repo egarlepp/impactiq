@@ -14,8 +14,9 @@ import {
   exchangeAuthorizationCode,
   generatePkce,
   getSalesforceAuthUrl,
+  isSalesforceAuthorizeUrl,
   isSalesforceConfigured,
-  signOAuthState,
+  signCallbackState,
   verifyOAuthState,
 } from '../../services/auth/salesforce.js'
 import {
@@ -25,6 +26,14 @@ import {
   generateBindingNonce,
   setOAuthBindingCookie,
 } from './oauthBinding.js'
+
+// The browser only ever goes to a Salesforce host over HTTPS, on the OAuth
+// authorize path. getSalesforceAuthUrl() already falls back to the standard
+// login host; this re-checks the final URL right before the redirect.
+function salesforceRedirectTarget(raw: string): string | null {
+  if (!isSalesforceAuthorizeUrl(raw)) return null
+  return new URL(raw).toString()
+}
 
 export const salesforceAuthRoutes = Router()
 
@@ -38,7 +47,7 @@ salesforceAuthRoutes.get('/salesforce', requireAuth, requireCrmProvider('salesfo
   }
   const { verifier, challenge } = generatePkce()
   const nonce = generateBindingNonce()
-  const state = signOAuthState(req.user!.id, nonce)
+  const state = signCallbackState(req.user!.id, nonce)
   // On a RECONNECT, the tenant's fallback login URL may point at a
   // different environment than the org the user was originally
   // connected to (a common trap: admin-level config was set to
@@ -58,7 +67,12 @@ salesforceAuthRoutes.get('/salesforce', requireAuth, requireCrmProvider('salesfo
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
-  res.redirect(url)
+  const target = salesforceRedirectTarget(url)
+  if (!target) {
+    res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
+    return
+  }
+  res.redirect(target)
 })
 
 // GET /auth/salesforce/callback — exchange code, encrypt + persist tokens, redirect home.
@@ -349,7 +363,7 @@ salesforceAuthRoutes.get('/salesforce-admin', requireAuth, requireAppAdmin, requ
   }
   const { verifier, challenge } = generatePkce()
   const nonce = generateBindingNonce()
-  const state = signOAuthState(`admin:${req.user!.id}`, nonce)
+  const state = signCallbackState(`admin:${req.user!.id}`, nonce)
   // On RECONNECT, honor the previously-connected instance URL so we
   // don't fall back to test.salesforce.com when the tenant fallback
   // and the actual admin org differ. Mirrors the user-side fix from
@@ -362,7 +376,12 @@ salesforceAuthRoutes.get('/salesforce-admin', requireAuth, requireAppAdmin, requ
     return
   }
   setOAuthBindingCookie(res, SF_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id, verifier })
-  res.redirect(url)
+  const target = salesforceRedirectTarget(url)
+  if (!target) {
+    res.status(503).json({ data: null, error: 'errors.salesforce.oauth_not_configured', meta: {} })
+    return
+  }
+  res.redirect(target)
 })
 
 // v1.73.0: cache the live health-check for 60s so a page that loads

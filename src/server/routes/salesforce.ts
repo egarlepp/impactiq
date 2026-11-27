@@ -599,10 +599,11 @@ salesforceRouter.patch('/opportunities/:id/field', async (req, res) => {
     res.status(409).json({ data: null, error: 'errors.salesforce.not_connected_write', meta: { field: parsed.data.apiName } }); return
   }
   try {
-    await conn.sobject('Opportunity').update({ Id: id, [parsed.data.apiName]: parsed.data.value })
+    const fieldUpdate: Record<string, unknown> = Object.fromEntries([[parsed.data.apiName, parsed.data.value]])
+    await conn.sobject('Opportunity').update({ ...fieldUpdate, Id: id })
     void logSfSyncAttempt({
       source: 'opportunity_field_update', status: 'success', operation: 'update', crmObject: 'Opportunity', crmRecordId: id,
-      userId, payload: { [parsed.data.apiName]: parsed.data.value },
+      userId, payload: fieldUpdate,
     })
     res.json({ data: { ok: true }, error: null, meta: {} })
   } catch (err) {

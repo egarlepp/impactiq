@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { requireAuth } from '../../middleware/auth.js'
 import { requireAppAdmin } from '../../middleware/rbac.js'
-import { signOAuthState, verifyOAuthState } from '../../services/auth/salesforce.js'
+import { signCallbackState, verifyOAuthState } from '../../services/auth/salesforce.js'
 import { logAudit } from '../../services/audit/log.js'
 import { getGongStoredView, saveGongOAuthTokens } from '../../services/gong/config.js'
 import { gongOAuthRedirectUri } from '../../services/gong/connection.js'
@@ -37,7 +37,7 @@ gongAuthRoutes.get('/gong', requireAuth, requireAppAdmin, async (req, res) => {
     return
   }
   const nonce = generateBindingNonce()
-  const state = signOAuthState(`${STATE_PREFIX}${req.user!.id}`, nonce)
+  const state = signCallbackState(`${STATE_PREFIX}${req.user!.id}`, nonce)
   setOAuthBindingCookie(res, GONG_BINDING_COOKIE_PREFIX, state, { nonce, userId: req.user!.id })
   res.redirect(buildGongAuthorizeUrl({ clientId: view.oauthClientId, redirectUri, state }))
 })

@@ -15,12 +15,13 @@ import {
   generatePkce as generateAzurePkce,
   isAzureSsoConfigured,
   getAzureSsoConfig,
-  signOAuthState as signAzureState,
+  signCallbackState as signAzureState,
   verifyOAuthState as verifyAzureState,
   verifyAzureIdToken,
 } from '../../services/auth/azureSso.js'
 
 import { oidcLimiter, encryptPkceParams, decryptPkceParams } from './oidc.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 export const azureAuthRoutes = Router()
 
@@ -67,7 +68,7 @@ azureAuthRoutes.get('/azure/callback', oidcLimiter, async (req, res) => {
   const state = req.query['state']
   const errorParam = req.query['error']
   if (typeof errorParam === 'string') {
-    console.warn('[azure callback] identity provider returned an error:', errorParam.replace(/[^\w.-]/g, '').slice(0, 100))
+    console.warn('[azure callback] identity provider returned an error:', logSafe(errorParam.replace(/[^\w.-]/g, '').slice(0, 100)))
     res.redirect(`/?ssoConnect=error&reason=${ssoErrorReason(errorParam)}`)
     return
   }
@@ -98,7 +99,7 @@ azureAuthRoutes.get('/azure/callback', oidcLimiter, async (req, res) => {
     idClaims = await verifyAzureIdToken(tokens.id_token, pkceParams.n)
     info = await fetchAzureUserInfo(tokens.access_token)
   } catch (err) {
-    console.warn('[azure callback]', err instanceof Error ? err.message : String(err))
+    console.warn('[azure callback]', logSafe(err))
     res.redirect('/?ssoConnect=error&reason=errors.auth.sso_failed')
     return
   }

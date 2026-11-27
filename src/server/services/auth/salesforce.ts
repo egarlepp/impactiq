@@ -61,7 +61,7 @@ export function generatePkce(): { verifier: string; challenge: string } {
 // PKCE). It sits in the encrypted binding cookie next to the same nonce
 // (routes/auth/oauthBinding.ts), and the callback checks all of them
 // against the signed-in session.
-export function signOAuthState(userId: string, nonce: string): string {
+export function signCallbackState(userId: string, nonce: string): string {
   const expires = String(Date.now() + STATE_TTL_MS)
   const payload = `${userId}.${expires}.${nonce}`
   const sig = crypto
@@ -106,7 +106,22 @@ export function getSalesforceAuthUrl(state: string, codeChallenge: string, hostO
   // recorded instance URL), prefer it — a reconnect must land the user
   // on the same org they were connected to, not the tenant-wide fallback.
   const base = hostOverride ? normalizeSfOauthHost(hostOverride) : getSalesforceLoginUrl()
-  return `${base}/services/oauth2/authorize?${params.toString()}`
+  const url = `${base}/services/oauth2/authorize?${params.toString()}`
+  // The browser is sent here, so only ever a Salesforce host over HTTPS.
+  // A stored instance URL (or a misconfigured login URL) that isn't one
+  // falls back to the standard login host instead of an open redirect.
+  if (isSalesforceAuthorizeUrl(url)) return url
+  return `https://login.salesforce.com/services/oauth2/authorize?${params.toString()}`
+}
+
+// True for an https URL on a salesforce.com / force.com host, on the OAuth
+// authorize path. Parsed rather than regex-matched, so it runs in linear time.
+export function isSalesforceAuthorizeUrl(url: string): boolean {
+  let target: URL
+  try { target = new URL(url) } catch { return false }
+  const host = target.hostname.toLowerCase()
+  const salesforceHost = host === 'salesforce.com' || host.endsWith('.salesforce.com') || host === 'force.com' || host.endsWith('.force.com')
+  return target.protocol === 'https:' && salesforceHost && target.pathname === '/services/oauth2/authorize'
 }
 
 export interface SfTokenResponse {

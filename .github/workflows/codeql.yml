@@ -26,6 +26,11 @@ jobs:
     if: >-
       (github.event_name == 'schedule' && github.repository == 'egarlepp/impactiq') ||
       (github.event_name != 'schedule' && github.event.repository.private == false)
+    # Scan the whole codebase on pull requests too. By default CodeQL only
+    # reports data-flow findings on the lines a PR changes, which hides older
+    # alerts from the findings list below.
+    env:
+      CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'
     permissions:
       actions: read
       contents: read

@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
+import { stripTrailing } from '../../lib/strings.js'
 
 // RFC 6238 TOTP with SHA-1, 6 digits, 30-second window. Compatible with
 // every authenticator app (Google Authenticator, 1Password, Authy, Microsoft
@@ -27,7 +28,7 @@ export function base32Encode(buf: Buffer): string {
 }
 
 export function base32Decode(input: string): Buffer {
-  const s = input.toUpperCase().replace(/=+$/, '').replace(/\s+/g, '')
+  const s = stripTrailing(input.toUpperCase().replace(/\s+/g, ''), '=')
   let bits = 0
   let value = 0
   const bytes: number[] = []

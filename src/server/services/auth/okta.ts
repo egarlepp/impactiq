@@ -3,6 +3,7 @@ import { safeFetch } from '../net/safeFetch.js'
 import { getOktaIntegrationConfig } from '../config/integrations.js'
 import { getOktaGroupSettings } from '../config/auth-policy.js'
 import { SESSION_SECRET } from '../config/env.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 // State-token HMAC uses the session secret — this is not a token-encryption
 // key; it's just proof the state came from us. Fails loud when unset in prod.
@@ -83,7 +84,7 @@ async function discoverEndpoints(domain: string): Promise<OidcEndpoints> {
   throw new Error(`Okta OIDC discovery failed for ${host}: ${lastErr instanceof Error ? lastErr.message : String(lastErr)}`)
 }
 
-export function signOAuthState(nonce: string): string {
+export function signCallbackState(nonce: string): string {
   const expires = String(Date.now() + STATE_TTL_MS)
   const payload = `${nonce}.${expires}`
   const sig = crypto
@@ -134,7 +135,7 @@ export async function getOktaAuthUrl(state: string, opts: { nonce: string; codeC
   try {
     endpoints = await discoverEndpoints(cfg.domain)
   } catch (err) {
-    console.warn('[okta] discovery failed:', err)
+    console.warn('[okta] discovery failed:', logSafe(err))
     return null
   }
   const groupSettings = getOktaGroupSettings()

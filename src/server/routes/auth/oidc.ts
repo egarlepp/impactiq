@@ -15,7 +15,7 @@ export const oidcLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30 })
 // Bundle the PKCE verifier + OIDC nonce into a signed cookie tied to state.
 // The cookie name is derived from state so multiple in-flight logins from
 // the same browser don't collide.
-export const OAUTH_PARAMS_COOKIE_PREFIX = 'impactiq_okta_params_'
+export const OKTA_PARAMS_COOKIE_PREFIX = 'impactiq_okta_params_'
 
 // v1.256.1: the cookie payload is AES-256-GCM encrypted (same
 // TOKEN_ENCRYPTION_KEY-derived cipher as Salesforce/Microsoft token

@@ -3228,3 +3228,15 @@
   (`js/user-controlled-bypass`, 8). HubSpot `htmlToText()` strips tags until none remain
   (`js/incomplete-multi-character-sanitization`). The CodeQL workflow skips `*.test.ts(x)` and `tests/**` (the regex and
   three rate-limit alerts were in tests) and prints every finding in its job log.
+- **v1.482.2** (2026-11-27) Cleared the 48 CodeQL alerts the PR scans had hidden: PR scans were diff-informed (data-flow
+  results only on changed lines), so `codeql.yml` now sets `CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'` and every PR
+  scan lists the whole codebase. Log injection (16): `logSafe()` (`lib/logSafe.ts`) strips CR/LF and caps length on any
+  request- or integration-sourced value logged. Remote property injection (10): `definedEntries()` / `changedFields()`
+  (`lib/records.ts`), `Object.fromEntries` and `Map` instead of `obj[key] = v`. Request forgery (7):
+  `microsoftIdentityUrl()` (`services/auth/microsoftIdentity.ts`) validates the tenant id (throws on an invalid one) and builds
+  every login.microsoftonline.com URL; HubSpot URLs are joined onto the fixed origin and re-checked. Salesforce sign-in
+  redirects only to an `https://*.salesforce.com|force.com/services/oauth2/authorize?` URL, else the standard login host.
+  ReDoS (4): `stripTrailing()` / `trimChar()` (`lib/strings.ts`) replace `/\/+$/`-style regexes. Loop bounds and type
+  confusion: `typeof` checks on CSV text and demo calendar dates, `for...of` in Flight Deck reorder. Clear-text storage
+  (3) was the naming heuristic matching "OAuth" in cookie-name inputs: `signOAuthState` is now `signCallbackState` and
+  the Okta params cookie prefix constant is `OKTA_PARAMS_COOKIE_PREFIX` (cookie names unchanged).

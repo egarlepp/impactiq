@@ -15,6 +15,15 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.482.2',
+    date: '2026-11-27',
+    highlights: [
+      { category: 'security', text: 'Values from requests and integrations are cleaned before they reach the server log, so a crafted value can no longer add fake log lines.' },
+      { category: 'security', text: 'Microsoft sign-in, Outlook and email calls only accept a valid Microsoft tenant id, Salesforce sign-in only ever sends the browser to a Salesforce address, and HubSpot calls can never leave api.hubapi.com.' },
+      { category: 'security', text: 'Admin edits, CSV import and dashboard data build their records without letting request fields set object internals, and text trimming no longer slows down on long crafted input.' },
+    ],
+  },
+  {
     version: '1.482.1',
     date: '2026-11-27',
     highlights: [

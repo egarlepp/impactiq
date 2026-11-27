@@ -38,8 +38,8 @@ let testDb: TestDb
 let app: express.Express
 let issueSession: typeof import('../../services/auth/session.js')['issueSession']
 let verifySession: typeof import('../../services/auth/session.js')['verifySession']
-let signSfState: typeof import('../../services/auth/salesforce.js')['signOAuthState']
-let signMsState: typeof import('../../services/auth/microsoft.js')['signOAuthState']
+let signSfState: typeof import('../../services/auth/salesforce.js')['signCallbackState']
+let signMsState: typeof import('../../services/auth/microsoft.js')['signCallbackState']
 let encryptToken: typeof import('../../services/config/crypto.js')['encryptToken']
 let SF_PREFIX = ''
 let MS_PREFIX = ''
@@ -50,8 +50,8 @@ beforeAll(async () => {
   const session = await import('../../services/auth/session.js')
   issueSession = session.issueSession
   verifySession = session.verifySession
-  signSfState = (await import('../../services/auth/salesforce.js')).signOAuthState
-  signMsState = (await import('../../services/auth/microsoft.js')).signOAuthState
+  signSfState = (await import('../../services/auth/salesforce.js')).signCallbackState
+  signMsState = (await import('../../services/auth/microsoft.js')).signCallbackState
   encryptToken = (await import('../../services/config/crypto.js')).encryptToken
   const binding = await import('./oauthBinding.js')
   SF_PREFIX = binding.SF_BINDING_COOKIE_PREFIX

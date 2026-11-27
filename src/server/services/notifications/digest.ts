@@ -12,6 +12,7 @@ import { getEmailIntegrationConfig } from '../config/integrations.js'
 import { scheduleJob } from '../jobs/scheduler.js'
 import { writeRun } from '../jobs/writeRun.js'
 import { localDayKeyFor } from '../../lib/localDate.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 const TICK_MS = 60_000
 const DIGEST_HOUR = 8
@@ -159,7 +160,7 @@ export async function tickDigest(now: Date = new Date(), targetHour = DIGEST_HOU
         continue
       }
       await db.update(userNotificationPrefs).set({ lastDigestAt: now }).where(eq(userNotificationPrefs.userId, u.userId))
-      console.log(`[digest] sent to ${u.email} (${items.length} items, via ${result.emailed && emailCfg ? emailCfg.authMethod : 'slack'})`)
+      console.log(`[digest] sent to ${logSafe(u.email)} (${items.length} items, via ${logSafe(result.emailed && emailCfg ? emailCfg.authMethod : 'slack')})`)
       sent++
     } catch (err) {
       console.warn(`[digest] failed for user ${u.userId}:`, err)

@@ -7,6 +7,7 @@ import { logAudit } from '../../services/audit/log.js'
 import { z } from 'zod'
 import { renameLegacyKeys, LEGACY_FIELD_MAPPING_KEYS } from '../../../shared/legacyKeys.js'
 import { validateTeamMappings, sampleObjectRecord } from '../../services/salesforce/mappingValidation.js'
+import { logSafe } from '../../lib/logSafe.js'
 
 export const fieldMappingsRoutes = Router()
 
@@ -177,7 +178,7 @@ fieldMappingsRoutes.get('/teams/:teamId/sf-field-mappings/sample', requireAppAdm
     res.json({ data: result, error: null, meta: {} })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error('[/api/admin/teams/:teamId/sf-field-mappings/sample] failed:', message)
+    console.error('[/api/admin/teams/:teamId/sf-field-mappings/sample] failed:', logSafe(message))
     res.status(500).json({ data: null, error: 'errors.sf_mappings.sample_failed', meta: {} })
   }
 })
