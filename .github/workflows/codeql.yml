@@ -26,6 +26,11 @@ jobs:
     if: >-
       (github.event_name == 'schedule' && github.repository == 'egarlepp/impactiq') ||
       (github.event_name != 'schedule' && github.event.repository.private == false)
+    # Scan the whole codebase on pull requests too. By default CodeQL only
+    # reports data-flow findings on the lines a PR changes, which hides older
+    # alerts from the findings list below.
+    env:
+      CODEQL_ACTION_DIFF_INFORMED_QUERIES: 'false'
     permissions:
       actions: read
       contents: read
@@ -35,7 +40,6 @@ jobs:
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           languages: javascript-typescript
-          tools: https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.27.5/codeql-bundle-linux64.tar.zst
           queries: security-extended
           # Test files build throwaway Express apps and match error text with
           # loose regexes; they never ship, so they're left out of the scan.
