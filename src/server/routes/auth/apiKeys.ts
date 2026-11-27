@@ -4,11 +4,16 @@ import { and, eq } from 'drizzle-orm'
 import { db } from '../../db/index.js'
 import { hasAnyLeaderOrAdminRole } from '../../middleware/rbac.js'
 import { requireAuth } from '../../middleware/auth.js'
-import { apiKeys as apiKeysTbl } from '../../../../drizzle/schema.js'
+import { apiKeys as apiKeysTbl, users } from '../../../../drizzle/schema.js'
 import { desc, isNull } from 'drizzle-orm'
 import { hashRawKey, keyPrefix, newRawApiKey } from '../../services/auth/apiKeys.js'
 
 export const apiKeysAuthRoutes = Router()
+
+async function isAppAdminUser(userId: string): Promise<boolean> {
+  const [row] = await db.select({ isAppAdmin: users.isAppAdmin }).from(users).where(eq(users.id, userId)).limit(1)
+  return row?.isAppAdmin === true
+}
 
 // ── API Keys ──────────────────────────────────────────────────────────────
 
@@ -30,7 +35,7 @@ apiKeysAuthRoutes.get('/api-keys', requireAuth, async (req, res) => {
   res.json({ data: rows, error: null, meta: {} })
 })
 
-const VALID_SCOPES = ['rest:full', 'mcp:read', 'effort:read'] as const
+const VALID_SCOPES = ['rest:full', 'mcp:read', 'effort:read', 'activities:log'] as const
 // POST /auth/api-keys — mint a new key. The plaintext is returned ONCE.
 apiKeysAuthRoutes.post('/api-keys', requireAuth, async (req, res) => {
   const parsed = z.object({
@@ -50,6 +55,12 @@ apiKeysAuthRoutes.post('/api-keys', requireAuth, async (req, res) => {
   // v1.448.0: effort:read (GET /api/v1/effort, for CriteriaIQ) returns
   // per-person hours across the owner's teams, so it has the same gate.
   if ((scopes.includes('mcp:read') || scopes.includes('effort:read')) && !(await hasAnyLeaderOrAdminRole(req.user!.id))) {
+    res.status(403).json({ data: null, error: 'errors.forbidden', meta: {} })
+    return
+  }
+  // v1.481.0: activities:log (POST /api/v1/activities/log, for DemoIQ) logs a
+  // draft activity for ANY user named by email, so only an App Admin may hold it.
+  if (scopes.includes('activities:log') && !(await isAppAdminUser(req.user!.id))) {
     res.status(403).json({ data: null, error: 'errors.forbidden', meta: {} })
     return
   }

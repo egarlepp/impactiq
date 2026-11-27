@@ -599,6 +599,11 @@ export const activities = pgTable('activities', {
   // Also cleared on reappearance, so a re-created meeting starts fresh.
   outlookDeletedKept: boolean('outlook_deleted_kept').default(false).notNull(),
   isArchived: boolean('is_archived').default(false).notNull(),
+  // v1.481.0: the logging tool's own id for an activity created through
+  // POST /api/v1/activities/log (activities:log key), e.g. "demoiq:run:<id>".
+  // Unique when set (partial index, migration 0187), so a retried call never
+  // creates a second activity. Null for activities logged in ImpactIQ.
+  externalRef: text('external_ref'),
 })
 
 // v1.259.0: generalized from an activity-writeback-only log into the

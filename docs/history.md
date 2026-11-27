@@ -3207,3 +3207,15 @@
 - **v1.480.0** (2026-11-20) Activities page nudges render as one stacked card (`WeeklyView.tsx`) instead of a vertical
   list: an "N of M" count with previous/next arrows on the left, one or two cards peeking out underneath when there are
   more, and Mark read / Snooze removing the current nudge so the next takes its place (index clamped when the list shrinks).
+- **v1.481.0** (2026-11-24) `POST /api/v1/activities/log` (`routes/activityLogApi.ts`, `services/activities/externalLog.ts`,
+  contract in `docs/activity-log-api.md`): another tool logs an activity for a user named by email, always as a draft,
+  so the person confirms it and links the CRM record before write-back runs. New `activities:log` key scope, minted and
+  used only by App Admins (checked on every call), refused by `/api/*` and `/api/mcp`, limited per key and per address
+  (120/min, before the key check), CSRF-exempt like the effort
+  POSTs. `activities.external_ref` (migration 0187, partial unique index) holds the caller's id, so a retry returns the
+  first activity instead of logging twice. Audited as `activity.log_via_api`. DemoIQ is the first caller.
+- **v1.482.0** (2026-11-24) `GET /api/v1/activities/subtypes?ownerEmail=&activityType=` (same `activities:log` key and
+  checks as the log endpoint) lists the Subtypes of that person's type on the team the log call would pick, in sort
+  order, or none when the team has Subtypes off. `POST /api/v1/activities/log` takes an optional `subtype` (by name, any
+  case) and stores `subtype_id` + the `subtype_name` snapshot; no match or Subtypes off logs without one, and the
+  response's `subtype` says which it got, so a renamed Subtype never fails a log. DemoIQ uses both for its demo types.

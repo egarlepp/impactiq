@@ -263,6 +263,7 @@
       "scope_rest_full_hint": "完全な REST API アクセス（レガシー既定）",
       "scope_mcp_read_hint": "LLM ツール / n8n 用の MCP 経由の読み取り専用アクセス",
       "scope_effort_read_hint": "CriteriaIQ 用の CRM 商談ごとの合計時間（それ以外は不可）",
+      "scope_activities_log_hint": "DemoIQ 用。メールアドレスで指定した任意のユーザーの下書きアクティビティを記録します（アプリ管理者のみ）",
       "col_scopes": "スコープ",
       "mcp_connect_title": "このキーを Claude に接続",
       "mcp_connect_desktop_label": "Claude Desktop / Claude Code — mcp.json",

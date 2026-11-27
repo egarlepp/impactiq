@@ -15,6 +15,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.482.0',
+    date: '2026-11-24',
+    highlights: [
+      { category: 'feature', text: 'DemoIQ can now list a person\'s Demo Subtypes and log a demo with one, so the demo types an SE picks in DemoIQ are the ones your team set up here.' },
+    ],
+  },
+  {
+    version: '1.481.0',
+    date: '2026-11-24',
+    highlights: [
+      { category: 'feature', text: 'New activities:log API key type: DemoIQ can log a finished demo for the SE who ran it, by email. It arrives as a draft on their Activities list to check, link to the CRM record and approve.' },
+      { category: 'security', text: 'Only an App Admin can create or use an activities:log key, it reaches that one endpoint, nothing goes to the CRM until the person approves, and every logged activity is in the Audit Log.' },
+    ],
+  },
+  {
     version: '1.480.0',
     date: '2026-11-20',
     highlights: [
